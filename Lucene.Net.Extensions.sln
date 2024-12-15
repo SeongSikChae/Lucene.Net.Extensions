@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Extensions", "Lucene.Net.Extensions\Lucene.Net.Extensions.csproj", "{DF4D1542-40DF-4922-AE9C-F67F281D4A73}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.ExtensionsTests", "Lucene.Net.ExtensionsTests\Lucene.Net.ExtensionsTests.csproj", "{C7FE6F97-CBD5-4213-973D-468B8C893F9F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{DF4D1542-40DF-4922-AE9C-F67F281D4A73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF4D1542-40DF-4922-AE9C-F67F281D4A73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF4D1542-40DF-4922-AE9C-F67F281D4A73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7FE6F97-CBD5-4213-973D-468B8C893F9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7FE6F97-CBD5-4213-973D-468B8C893F9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7FE6F97-CBD5-4213-973D-468B8C893F9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7FE6F97-CBD5-4213-973D-468B8C893F9F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

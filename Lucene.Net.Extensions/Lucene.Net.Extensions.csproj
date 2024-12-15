@@ -5,12 +5,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace />
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>SeongSikChae</Authors>
     <PackageProjectUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <Version>4.8.0-beta00017</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00017" />
+  </ItemGroup>
 
 </Project>

@@ -1,0 +1,65 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore -c Release
+
+    - name: Test
+      run: dotnet test --no-build -c Release --verbosity normal
+
+    - name: Get Project Version
+      uses: bbonkr/get-version-action@v1
+      id: project_version
+      with:
+        project: "./Lucene.Net.Extensions/Lucene.Net.Extensions.csproj" 
+
+    - name: Create Git Tag
+      id: create_tag
+      run: |
+        TAG_NAME=v${{ steps.project_version.outputs.version }}
+        git tag $TAG_NAME -d || true
+        git tag $TAG_NAME
+        git push origin --delete $TAG_NAME || true
+        git push origin $TAG_NAME
+        echo "tag_name=$TAG_NAME" >> $GITHUB_ENV
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Delete existing release
+      run: |
+        TAG_NAME=${{ env.tag_name }}
+        gh release delete $TAG_NAME -y || true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload to GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ./Lucene.Net.Extensions/bin/Release/Lucene.Net.Extensions.${{ steps.project_version.outputs.version }}.nupkg
+        tag_name: ${{ env.tag_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
