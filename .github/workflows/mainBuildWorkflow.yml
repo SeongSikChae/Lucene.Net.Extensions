@@ -59,7 +59,7 @@ jobs:
     - name: Upload to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        files: ./Lucene.Net.Extensions/bin/Release/Lucene.Net.Extensions.${{ steps.project_version.outputs.version }}.nupkg
+        files: ./Lucene.Net.Extensions/bin/Release/Biz.Bizadm.Lucene.Net.Extensions.${{ steps.project_version.outputs.version }}.nupkg
         tag_name: ${{ env.tag_name }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
