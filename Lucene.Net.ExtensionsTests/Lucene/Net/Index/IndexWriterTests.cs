@@ -474,7 +474,7 @@ namespace Lucene.Net.Index
 		}
 
 		[TestMethod]
-		public void IPAddress4FieldTest()
+		public void IPAddressFieldIPv4Test()
 		{
 			DirectoryInfo dir = new DirectoryInfo("test");
 			if (dir.Exists)
@@ -488,7 +488,7 @@ namespace Lucene.Net.Index
 
 			writer.Commit();
 			Document doc = [
-					new IPAddress4Field("A", IPAddress.Parse("0.0.0.0"), Field.Store.YES), new IPAddress4Field("B", IPAddress.Parse("255.255.255.255"), Field.Store.YES),
+					new IPAddressField("A", IPAddress.Parse("0.0.0.0"), Field.Store.YES), new IPAddressField("B", IPAddress.Parse("255.255.255.255"), Field.Store.YES),
 				];
 			writer.AddDocument(doc);
 			writer.Commit();
@@ -502,17 +502,51 @@ namespace Lucene.Net.Index
 			TopFieldCollector collector = TopFieldCollector.Create(sort, 10, true, true, true, true);
 			searcher.Search(new MatchAllDocsQuery(), collector);
 			TopDocs topDocs = collector.GetTopDocs();
-			IIndexableField aField = searcher.Doc(topDocs.ScoreDocs[0].Doc).GetField("A");
-			IPAddress? aValue = aField.GetIPAddressValue();
+			Document storedDoc = searcher.Doc(topDocs.ScoreDocs[0].Doc);
+			IPAddress? aValue = storedDoc.GetIPAddressValue("A");
 
 			Assert.IsNotNull(aValue);
 			Assert.AreEqual(IPAddress.Parse("0.0.0.0"), aValue);
 
-			IIndexableField bField = searcher.Doc(topDocs.ScoreDocs[0].Doc).GetField("B");
-			IPAddress? bValue = bField.GetIPAddressValue();
+			IPAddress? bValue = storedDoc.GetIPAddressValue("B");
 
 			Assert.IsNotNull(bValue);
 			Assert.AreEqual(IPAddress.Parse("255.255.255.255"), bValue);
+		}
+
+		[TestMethod]
+		public void IPAddressFieldIPv6Test()
+		{
+			DirectoryInfo dir = new DirectoryInfo("test");
+			if (dir.Exists)
+				dir.Delete(true);
+			using FSDirectory directory = FSDirectory.Open(dir);
+			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
+			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
+				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
+				.SetMergePolicy(new TieredMergePolicy());
+			using IndexWriter writer = new IndexWriter(directory, config);
+
+			writer.Commit();
+			IPAddress ipv6 = IPAddress.Parse("2001:db8::1");
+			Document doc = [.. IPAddressField.CreateFields("A", ipv6, Field.Store.YES)];
+			writer.AddDocument(doc);
+			writer.Commit();
+			writer.ForceMerge(1);
+
+			using SearcherManager searcherManager = new SearcherManager(directory, null);
+			IndexSearcher searcher = searcherManager.Acquire();
+
+			SortField field = new SortField("A", SortFieldType.INT64);
+			Sort sort = new Sort(field);
+			TopFieldCollector collector = TopFieldCollector.Create(sort, 10, true, true, true, true);
+			searcher.Search(new MatchAllDocsQuery(), collector);
+			TopDocs topDocs = collector.GetTopDocs();
+			Document storedDoc = searcher.Doc(topDocs.ScoreDocs[0].Doc);
+			IPAddress? aValue = storedDoc.GetIPAddressValue("A");
+
+			Assert.IsNotNull(aValue);
+			Assert.AreEqual(ipv6, aValue);
 		}
 	}
 }

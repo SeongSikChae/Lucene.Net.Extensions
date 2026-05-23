@@ -2,6 +2,8 @@
 
 namespace Lucene.Net.Index
 {
+	using Documents;
+
 	public static class IndexableFieldExtensions
 	{
 		public static sbyte? GetSByteValue(this IIndexableField field)
@@ -44,12 +46,24 @@ namespace Lucene.Net.Index
 			return (Half)v.Value;
 		}
 
-		public static IPAddress? GetIPAddressValue(this IIndexableField field)
+		public static IPAddress? GetIPAddressValue(this IIndexableField field, Document document)
 		{
-			int? v = field.GetInt32Value();
-			if (!v.HasValue)
-				return null;
-			return v.Value.ToIPAddress();
+			IIndexableField? lowField = document.GetField(field.Name + IPAddressField.LowPartSuffix);
+			if (lowField is not null)
+			{
+				long? high = field.GetInt64Value();
+				long? low = lowField.GetInt64Value();
+				if (!high.HasValue || !low.HasValue)
+					return null;
+
+				return IPAddressExtensions.ToIPv6Address(high.Value, low.Value);
+			}
+
+			int? v4 = field.GetInt32Value();
+			if (v4.HasValue)
+				return v4.Value.ToIPAddress();
+
+			return null;
 		}
 	}
 }

@@ -1,6 +1,4 @@
-﻿using System.Buffers.Binary;
-
-namespace Lucene.Net.Documents
+﻿namespace Lucene.Net.Documents
 {
 	public sealed class UInt16Field : Field
 	{
