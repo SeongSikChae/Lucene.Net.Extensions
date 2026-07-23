@@ -17,10 +17,11 @@
 		<PackageProjectUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<Version>4.8.0-beta00017</Version>
+		<Version>4.8.0-beta00018</Version>
 		<AssemblyName>Biz.Bizadm.$(MSBuildProjectName)</AssemblyName>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<Description>.NET 각 데이터 타입을 기반으로 인덱싱하고 검색 할 수 있게 기능 확장</Description>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -35,7 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00017" />
+		<PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00018" />
 	</ItemGroup>
 
 </Project>
