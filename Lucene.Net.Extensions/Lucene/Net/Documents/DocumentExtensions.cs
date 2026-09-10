@@ -14,5 +14,13 @@ namespace Lucene.Net.Documents
 
             return field.GetIPAddressValue(document);
         }
+
+        public static decimal? GetDecimalValue(this Document document, string name)
+        {
+            IIndexableField? field = document.GetField(name);
+            if (field is null)
+                return null;
+            return field.GetDecimalValue(document);
+        }
     }
 }

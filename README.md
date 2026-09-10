@@ -10,10 +10,12 @@
 * UInt64Field
 * HalfField
 * IPAddressField
+* DecimalField
 
 ### Lucene.Net.Documents.Document Extensions
 
 * IPAddress? GetIPAddressValue(string name)
+* decimal? GetDecimalValue(string name)
 
 ## Lucene.Net.Index namespace Extensions
 
@@ -25,6 +27,7 @@
 * ulong? GetUInt64Value()
 * Half? GetHalfValue()
 * IPAddress? GetIPAddressValue(Document document)
+* decimal? GetDecimalValue(Document document)
 
 ## System namespace Extensions
 
@@ -67,6 +70,5 @@
 ### System.Net.IPAddress Extensions
 
 * IPAddress NormalizeForStorage()
-* int ToInt32()
 * void ToInt64Pair()
-* IPAddress ToIPv6Address(long high, long low)
+* IPAddress ToIPAddress(long high, long low)

@@ -488,8 +488,9 @@ namespace Lucene.Net.Index
 
 			writer.Commit();
 			Document doc = [
-					new IPAddressField("A", IPAddress.Parse("0.0.0.0"), Field.Store.YES), new IPAddressField("B", IPAddress.Parse("255.255.255.255"), Field.Store.YES),
-				];
+                ..IPAddressField.CreateFields("A", IPAddress.Parse("0.0.0.0"), Field.Store.YES),
+                ..IPAddressField.CreateFields("B", IPAddress.Parse("255.255.255.255"), Field.Store.YES)
+			];
 			writer.AddDocument(doc);
 			writer.Commit();
 			writer.ForceMerge(1);
@@ -497,8 +498,7 @@ namespace Lucene.Net.Index
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
 			IndexSearcher searcher = searcherManager.Acquire();
 
-			SortField field = new SortField("A", SortFieldType.INT32);
-			Sort sort = new Sort(field);
+			Sort sort = new Sort([..IPAddressField.CreateSortField("A")]);
 			TopFieldCollector collector = TopFieldCollector.Create(sort, 10, true, true, true, true);
 			searcher.Search(new MatchAllDocsQuery(), collector);
 			TopDocs topDocs = collector.GetTopDocs();
@@ -537,8 +537,7 @@ namespace Lucene.Net.Index
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
 			IndexSearcher searcher = searcherManager.Acquire();
 
-			SortField field = new SortField("A", SortFieldType.INT64);
-			Sort sort = new Sort(field);
+			Sort sort = new Sort([..IPAddressField.CreateSortField("A")]);
 			TopFieldCollector collector = TopFieldCollector.Create(sort, 10, true, true, true, true);
 			searcher.Search(new MatchAllDocsQuery(), collector);
 			TopDocs topDocs = collector.GetTopDocs();
@@ -548,5 +547,89 @@ namespace Lucene.Net.Index
 			Assert.IsNotNull(aValue);
 			Assert.AreEqual(ipv6, aValue);
 		}
+
+        [TestMethod]
+        public void IPAddressFieldSortTest()
+        {
+            DirectoryInfo dir = new DirectoryInfo("test");
+            if (dir.Exists)
+                dir.Delete(true);
+            using FSDirectory directory = FSDirectory.Open(dir);
+            Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
+            IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
+                .SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
+                .SetMergePolicy(new TieredMergePolicy());
+            using IndexWriter writer = new IndexWriter(directory, config);
+
+            writer.Commit();
+			{
+                Document doc = [
+					..IPAddressField.CreateFields("A", IPAddress.Parse("192.168.0.4"), Field.Store.YES),
+				];
+                writer.AddDocument(doc);
+            }
+            {
+                Document doc = [
+                    ..IPAddressField.CreateFields("A", IPAddress.Parse("192.168.0.6"), Field.Store.YES),
+                ];
+                writer.AddDocument(doc);
+            }
+            {
+                Document doc = [
+                    ..IPAddressField.CreateFields("A", IPAddress.Parse("192.168.0.5"), Field.Store.YES),
+                ];
+                writer.AddDocument(doc);
+            }
+            writer.Commit();
+            writer.ForceMerge(1);
+
+            using SearcherManager searcherManager = new SearcherManager(directory, null);
+            IndexSearcher searcher = searcherManager.Acquire();
+
+            Sort sort = new Sort([.. IPAddressField.CreateSortField("A")]);
+            TopFieldCollector collector = TopFieldCollector.Create(sort, 10, true, true, true, true);
+            searcher.Search(new MatchAllDocsQuery(), collector);
+            TopDocs topDocs = collector.GetTopDocs();
+            Document storedDoc = searcher.Doc(topDocs.ScoreDocs[1].Doc);
+            IPAddress? aValue = storedDoc.GetIPAddressValue("A");
+
+            Assert.IsNotNull(aValue);
+            Assert.AreEqual("192.168.0.5", aValue.ToString());
+        }
+
+        [TestMethod]
+		public void DecimalFieldTest()
+		{
+            DirectoryInfo dir = new DirectoryInfo("test");
+            if (dir.Exists)
+                dir.Delete(true);
+            using FSDirectory directory = FSDirectory.Open(dir);
+            Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
+            IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
+                .SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
+                .SetMergePolicy(new TieredMergePolicy());
+            using IndexWriter writer = new IndexWriter(directory, config);
+
+            writer.Commit();
+
+			Document doc = [.. DecimalField.CreateFields("A", 123, Field.Store.YES)];
+            writer.AddDocument(doc);
+            writer.Commit();
+            writer.ForceMerge(1);
+
+            using SearcherManager searcherManager = new SearcherManager(directory, null);
+            IndexSearcher searcher = searcherManager.Acquire();
+
+            SortField field = new SortField("A", SortFieldType.INT32);
+            Sort sort = new Sort(field);
+            TopFieldCollector collector = TopFieldCollector.Create(sort, 10, true, true, true, true);
+            searcher.Search(new MatchAllDocsQuery(), collector);
+            TopDocs topDocs = collector.GetTopDocs();
+            Document storedDoc = searcher.Doc(topDocs.ScoreDocs[0].Doc);
+
+			decimal? value = storedDoc.GetDecimalValue("A");
+			Assert.IsNotNull(value);
+			Assert.AreEqual(123, value.Value);
+        }
 	}
 }
