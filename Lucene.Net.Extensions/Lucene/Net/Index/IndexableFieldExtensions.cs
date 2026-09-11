@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Lucene.Net.Util;
 
 namespace Lucene.Net.Index
 {
@@ -65,55 +66,50 @@ namespace Lucene.Net.Index
 		}
 
 		/// <summary>
-		/// Reads an <see cref="IPAddress"/> from the high limb field plus the matching low limb on <paramref name="document"/>.
+		/// Reads an <see cref="IPAddress"/> from a stored encoded payload produced by <see cref="IPAddressField"/>.
+		/// </summary>
+		public static IPAddress? GetIPAddressValue(this IIndexableField field)
+		{
+			ArgumentNullException.ThrowIfNull(field);
+			BytesRef? binary = field.GetBinaryValue();
+			if (binary is null)
+				return null;
+			return IPAddressExtensions.TryToIPAddress(binary.Bytes.AsSpan(binary.Offset, binary.Length), out IPAddress? address)
+				? address
+				: null;
+		}
+
+		/// <summary>
+		/// Reads an <see cref="IPAddress"/> from the stored field on <paramref name="document"/> named like <paramref name="field"/>.
 		/// </summary>
 		public static IPAddress? GetIPAddressValue(this IIndexableField field, Document document)
 		{
-            long? high = field.GetInt64Value();
-			if (!high.HasValue)
-				return null;
-
-            IIndexableField? lowField = document.GetField(field.Name + IPAddressField.LowPartSuffix);
-			if (lowField is null)
-				return null;
-            long? low = lowField.GetInt64Value();
-			if (!low.HasValue)
-				return null;
-
-            return IPAddressExtensions.ToIPAddress(high.Value, low.Value);
-        }
+			ArgumentNullException.ThrowIfNull(field);
+			ArgumentNullException.ThrowIfNull(document);
+			return document.GetIPAddressValue(field.Name);
+		}
 
 		/// <summary>
-		/// Reads a <see cref="decimal"/> from the flags field plus the matching GetBits parts on <paramref name="document"/>.
+		/// Reads a <see cref="decimal"/> from a stored GetBits payload produced by <see cref="DecimalField"/>.
+		/// </summary>
+		public static decimal? GetDecimalValue(this IIndexableField field)
+		{
+			ArgumentNullException.ThrowIfNull(field);
+			BytesRef? binary = field.GetBinaryValue();
+			if (binary is null || binary.Length != DecimalField.StoredBitsLength)
+				return null;
+
+			return DecimalField.FromStoredBits(binary.Bytes.AsSpan(binary.Offset, binary.Length));
+		}
+
+		/// <summary>
+		/// Reads a <see cref="decimal"/> from the stored field on <paramref name="document"/> named like <paramref name="field"/>.
 		/// </summary>
 		public static decimal? GetDecimalValue(this IIndexableField field, Document document)
 		{
-			IIndexableField? lowField = document.GetField(field.Name + DecimalField.LowPartSuffix);
-			if (lowField is null)
-				return null;
-            int? low = lowField.GetInt32Value();
-			if (!low.HasValue)
-				return null;
-
-            IIndexableField? midField = document.GetField(field.Name + DecimalField.MidPartSuffix);
-            if (midField is null)
-                return null;
-            int? mid = midField.GetInt32Value();
-            if (!mid.HasValue)
-                return null;
-
-            IIndexableField? highField = document.GetField(field.Name + DecimalField.HighPartSuffix);
-            if (highField is null)
-                return null;
-            int? high = highField.GetInt32Value();
-            if (!high.HasValue)
-                return null;
-
-            int? flags = field.GetInt32Value();
-			if (!flags.HasValue)
-				return null;
-
-			return new decimal([low.Value, mid.Value, high.Value, flags.Value]);
-        }
+			ArgumentNullException.ThrowIfNull(field);
+			ArgumentNullException.ThrowIfNull(document);
+			return document.GetDecimalValue(field.Name);
+		}
 	}
 }

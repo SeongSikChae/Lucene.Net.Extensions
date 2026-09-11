@@ -17,7 +17,7 @@
 		<PackageProjectUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<Version>4.8.0-beta00018-3</Version>
+		<Version>4.8.0-beta00018-4</Version>
 		<AssemblyName>Biz.Bizadm.$(MSBuildProjectName)</AssemblyName>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -38,6 +38,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00018" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Biz.Bizadm.Lucene.Net.ExtensionsTests" />
 	</ItemGroup>
 
 </Project>

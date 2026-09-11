@@ -1,7 +1,9 @@
 # Lucene.Net namespace Extensions
 
 .NET 데이터 타입을 Lucene.Net에서 인덱싱·검색·정렬할 수 있게 확장합니다.  
-대상 프레임워크: **.NET 10**, Lucene.Net **4.8.0-beta00018**, 패키지 버전 **4.8.0-beta00018-2**.
+대상 프레임워크: **.NET 10**, Lucene.Net **4.8.0-beta00018**, 패키지 버전 **4.8.0-beta00018-4**.
+
+> **Breaking change (4.8.0-beta00018-4):** `IPAddressField` / `DecimalField`는 limb AND 구조를 폐기하고, **논리값당 prefix-coded trie term** 으로 재설계했습니다. 기존 인덱스는 재색인이 필요합니다. 정렬은 `CreateSortValueFields`로 **단일값 `_$Sort` SortedDocValues** 를 쓰고, 범위 검색은 NumericUtils 스타일 **precision-step trie** 로 동작합니다.
 
 ## Lucene.Net.Documents namespace Extensions
 
@@ -18,28 +20,38 @@
 ### Lucene.Net.Documents.Document Extensions
 
 * IPAddress? GetIPAddressValue(string name)
+* IEnumerable<IPAddress> GetIPAddressValues(string name)
 * decimal? GetDecimalValue(string name)
+* IEnumerable<decimal> GetDecimalValues(string name)
 
 ### IPAddressField
 
-IPv4/IPv6를 `Int64` 페어(`name`, `name + "_L"`)로 저장합니다. IPv4-mapped IPv6는 저장 전 IPv4로 정규화됩니다.  
-범위/정확/존재 쿼리와 정렬을 지원합니다.
+검색·정렬용은 **17바이트 고정폭** (`family` 1바이트 + 주소 16바이트, IPv4는 우측 정렬 패딩)입니다.  
+`Store.YES`일 때 같은 이름에 **가변폭 stored**를 둡니다 (IPv4=5바이트, IPv6=17바이트).
+
+* IPv4-mapped IPv6(`::ffff:a.b.c.d`)는 저장 전 IPv4로 정규화됩니다.
+* `family`는 인코딩 선두 바이트입니다 (`4`=IPv4, `6`=IPv6). 정렬 시 모든 IPv4가 모든 IPv6보다 앞입니다.
+* IPv6 **scope ID**(`fe80::1%12` 등)는 인코딩에 포함되지 않으며, 복원 시 `fe80::1`처럼 scope 없이 돌아옵니다.
+* exact/range/exists는 문서당 다중값에서도 교차곱 없이 안전합니다.
+* exists는 `name + "_$Exists"` marker term(`"1"`)을 사용합니다.
+* 정렬은 `CreateSortValueFields` → `name + "_$Sort"` (문서당 **단일** SortedDocValues).
+* **예약 suffix:** `_$Exists`, `_$Sort` — 내부 전용입니다. 사용자 필드명과 충돌하지 않도록 피하세요.
 
 ```csharp
-// Index
 Document doc = [
+    // search + store (multi-value OK)
     ..IPAddressField.CreateFields("ip", IPAddress.Parse("192.168.0.1"), Field.Store.YES),
-    ..IPAddressField.CreateFields("ip6", IPAddress.Parse("2001:db8::1"), Field.Store.YES),
+    ..IPAddressField.CreateFields("ip", IPAddress.Parse("2001:db8::1"), Field.Store.YES),
+    // sort representative (single value)
+    ..IPAddressField.CreateSortValueFields("ip", IPAddress.Parse("192.168.0.1")),
 ];
 writer.AddDocument(doc);
 
-// Read
-IPAddress? ip = storedDoc.GetIPAddressValue("ip");
+IPAddress? first = storedDoc.GetIPAddressValue("ip");
+IEnumerable<IPAddress> all = storedDoc.GetIPAddressValues("ip");
 
-// Sort
 Sort sort = new Sort([..IPAddressField.CreateSortField("ip")]);
 
-// Query
 Query exact = IPAddressField.NewExactQuery("ip", IPAddress.Parse("192.168.0.10"));
 Query range = IPAddressField.NewRangeQuery(
     "ip",
@@ -51,21 +63,27 @@ Query exists = IPAddressField.NewExistsQuery("ip");
 
 ### DecimalField
 
-`decimal.GetBits` 결과를 4개의 `Int32Field`(`name + "_DL"`, `name + "_DM"`, `name + "_DH"`, `name`)로 저장해 정확한 값을 복원합니다.  
-동시에 순서 보존용 sortable limbs(`name + "_S0"`, `"_S1"`, `"_S2"`)를 인덱싱해 수치 범위 쿼리·정렬이 가능합니다.
+수치 순서 보존용 **24바이트 sortable** 값을 trie로 인덱싱하고,  
+`Store.YES`일 때 `decimal.GetBits` **16바이트**를 같은 필드명에 저장합니다.
+
+* exact/range는 sortable 기준이라 `20.0m`과 `20.00m`은 같은 수치로 매칭됩니다.
+* 저장된 복원 값은 GetBits scale을 유지합니다.
+* 정렬은 `CreateSortValueFields`로 단일 대표값을 `_$Sort`에 넣습니다.
+* **예약 suffix:** `_$Exists`, `_$Sort` — 내부 전용입니다. 사용자 필드명과 충돌하지 않도록 피하세요.
 
 ```csharp
-// Index
-Document doc = [..DecimalField.CreateFields("amount", 123.45m, Field.Store.YES)];
+Document doc = [
+    ..DecimalField.CreateFields("amount", 123.45m, Field.Store.YES),
+    ..DecimalField.CreateFields("amount", 10.5m, Field.Store.YES),
+    ..DecimalField.CreateSortValueFields("amount", 10.5m), // sort by min example
+];
 writer.AddDocument(doc);
 
-// Read
-decimal? amount = storedDoc.GetDecimalValue("amount");
+decimal? first = storedDoc.GetDecimalValue("amount");
+IEnumerable<decimal> all = storedDoc.GetDecimalValues("amount");
 
-// Sort (sortable limbs 기준 수치 순)
 Sort sort = new Sort([..DecimalField.CreateSortField("amount")]);
 
-// Query
 Query exact = DecimalField.NewExactQuery("amount", 20.0m);
 Query range = DecimalField.NewRangeQuery("amount", 10.5m, 30.25m);
 Query openMin = DecimalField.NewRangeQuery("amount", null, 10.5m);
@@ -81,7 +99,9 @@ Query exists = DecimalField.NewExistsQuery("amount");
 * uint? GetUInt32Value()
 * ulong? GetUInt64Value()
 * Half? GetHalfValue()
+* IPAddress? GetIPAddressValue()
 * IPAddress? GetIPAddressValue(Document document)
+* decimal? GetDecimalValue()
 * decimal? GetDecimalValue(Document document)
 
 ## System namespace Extensions
@@ -125,5 +145,10 @@ Query exists = DecimalField.NewExistsQuery("amount");
 ### System.Net.IPAddress Extensions
 
 * IPAddress NormalizeForStorage()
-* void ToInt64Pair()
-* IPAddress ToIPAddress(long high, long low)
+* byte[] ToSortableBytes()
+* void WriteSortableBytes(Span<byte> destination)
+* byte[] ToStoredBytes()
+* int WriteStoredBytes(Span<byte> destination)
+* bool IsEncodedAddress(ReadOnlySpan<byte> encoded)
+* bool TryToIPAddress(ReadOnlySpan<byte> encoded, out IPAddress? address)
+* IPAddress ToIPAddress(ReadOnlySpan<byte> encoded)

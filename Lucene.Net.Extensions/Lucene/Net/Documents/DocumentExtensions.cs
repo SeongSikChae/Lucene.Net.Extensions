@@ -1,41 +1,71 @@
 ﻿using System.Net;
+using Lucene.Net.Util;
 
 namespace Lucene.Net.Documents
 {
-    using Index;
+	using Index;
 
-    /// <summary>
-    /// Extension methods for reading typed values from a <see cref="Document"/>.
-    /// </summary>
-    public static class DocumentExtensions
-    {
-        /// <summary>
-        /// Reads an <see cref="IPAddress"/> previously indexed with <see cref="IPAddressField"/>.
-        /// </summary>
-        /// <param name="document">Document to read from.</param>
-        /// <param name="name">Base field name.</param>
-        /// <returns>The address, or <c>null</c> if the field is missing.</returns>
-        public static IPAddress? GetIPAddressValue(this Document document, string name)
-        {
-            IIndexableField? field = document.GetField(name);
-            if (field is null)
-                return null;
+	/// <summary>
+	/// Extension methods for reading typed values from a <see cref="Document"/>.
+	/// </summary>
+	public static class DocumentExtensions
+	{
+		/// <summary>
+		/// Reads the first <see cref="IPAddress"/> previously indexed with <see cref="IPAddressField"/>.
+		/// </summary>
+		public static IPAddress? GetIPAddressValue(this Document document, string name)
+		{
+			ArgumentNullException.ThrowIfNull(document);
+			foreach (IPAddress value in document.GetIPAddressValues(name))
+				return value;
+			return null;
+		}
 
-            return field.GetIPAddressValue(document);
-        }
+		/// <summary>
+		/// Reads all <see cref="IPAddress"/> values previously indexed with <see cref="IPAddressField"/>.
+		/// </summary>
+		public static IEnumerable<IPAddress> GetIPAddressValues(this Document document, string name)
+		{
+			ArgumentNullException.ThrowIfNull(document);
+			ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
-        /// <summary>
-        /// Reads a <see cref="decimal"/> previously indexed with <see cref="DecimalField"/>.
-        /// </summary>
-        /// <param name="document">Document to read from.</param>
-        /// <param name="name">Base field name.</param>
-        /// <returns>The value, or <c>null</c> if the field is missing.</returns>
-        public static decimal? GetDecimalValue(this Document document, string name)
-        {
-            IIndexableField? field = document.GetField(name);
-            if (field is null)
-                return null;
-            return field.GetDecimalValue(document);
-        }
-    }
+			foreach (BytesRef binary in document.GetBinaryValues(name))
+			{
+				if (binary is null)
+					continue;
+				if (!IPAddressExtensions.TryToIPAddress(binary.Bytes.AsSpan(binary.Offset, binary.Length), out IPAddress? address))
+					continue;
+
+				yield return address!;
+			}
+		}
+
+		/// <summary>
+		/// Reads the first <see cref="decimal"/> previously indexed with <see cref="DecimalField"/>.
+		/// </summary>
+		public static decimal? GetDecimalValue(this Document document, string name)
+		{
+			ArgumentNullException.ThrowIfNull(document);
+			foreach (decimal value in document.GetDecimalValues(name))
+				return value;
+			return null;
+		}
+
+		/// <summary>
+		/// Reads all <see cref="decimal"/> values previously indexed with <see cref="DecimalField"/>.
+		/// </summary>
+		public static IEnumerable<decimal> GetDecimalValues(this Document document, string name)
+		{
+			ArgumentNullException.ThrowIfNull(document);
+			ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+			foreach (BytesRef binary in document.GetBinaryValues(name))
+			{
+				if (binary is null || binary.Length != DecimalField.StoredBitsLength)
+					continue;
+
+				yield return DecimalField.FromStoredBits(binary.Bytes.AsSpan(binary.Offset, binary.Length));
+			}
+		}
+	}
 }

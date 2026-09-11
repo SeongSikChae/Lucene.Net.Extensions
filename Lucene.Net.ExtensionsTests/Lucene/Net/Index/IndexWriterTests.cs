@@ -1,4 +1,4 @@
-﻿using Lucene.Net.Analysis;
+using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index.Extensions;
@@ -19,10 +19,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void SByteFieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -38,7 +35,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.INT32);
 			Sort sort = new Sort(field);
@@ -61,10 +59,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void ByteFieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -80,7 +75,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.INT32);
 			Sort sort = new Sort(field);
@@ -103,10 +99,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void Int16FieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -122,7 +115,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.INT32);
 			Sort sort = new Sort(field);
@@ -145,10 +139,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void UInt16FieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -164,7 +155,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.INT32);
 			Sort sort = new Sort(field);
@@ -187,10 +179,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void Int32FieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -206,7 +195,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.INT32);
 			Sort sort = new Sort(field);
@@ -229,10 +219,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void UInt32FieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -248,7 +235,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.INT32);
 			Sort sort = new Sort(field);
@@ -271,10 +259,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void Int64FieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -290,7 +275,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.INT64);
 			Sort sort = new Sort(field);
@@ -313,10 +299,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void UInt64FieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -332,7 +315,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.INT64);
 			Sort sort = new Sort(field);
@@ -355,10 +339,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void HalfFieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -374,7 +355,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.SINGLE);
 			Sort sort = new Sort(field);
@@ -397,10 +379,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void SingleFieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -416,7 +395,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.SINGLE);
 			Sort sort = new Sort(field);
@@ -439,10 +419,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void DoubleFieldTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -458,7 +435,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			SortField field = new SortField("A", SortFieldType.DOUBLE);
 			Sort sort = new Sort(field);
@@ -481,10 +459,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void IPAddressFieldIPv4Test()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -494,14 +469,17 @@ namespace Lucene.Net.Index
 			writer.Commit();
 			Document doc = [
                 ..IPAddressField.CreateFields("A", IPAddress.Parse("0.0.0.0"), Field.Store.YES),
-                ..IPAddressField.CreateFields("B", IPAddress.Parse("255.255.255.255"), Field.Store.YES)
+                ..IPAddressField.CreateSortValueFields("A", IPAddress.Parse("0.0.0.0")),
+                ..IPAddressField.CreateFields("B", IPAddress.Parse("255.255.255.255"), Field.Store.YES),
+                ..IPAddressField.CreateSortValueFields("B", IPAddress.Parse("255.255.255.255")),
 			];
 			writer.AddDocument(doc);
 			writer.Commit();
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			Sort sort = new Sort([..IPAddressField.CreateSortField("A")]);
 			TopFieldCollector collector = TopFieldCollector.Create(sort, 10, true, true, true, true);
@@ -522,10 +500,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void IPAddressFieldIPv6Test()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -534,13 +509,18 @@ namespace Lucene.Net.Index
 
 			writer.Commit();
 			IPAddress ipv6 = IPAddress.Parse("2001:db8::1");
-			Document doc = [.. IPAddressField.CreateFields("A", ipv6, Field.Store.YES)];
+			Document doc =
+			[
+				.. IPAddressField.CreateFields("A", ipv6, Field.Store.YES),
+				.. IPAddressField.CreateSortValueFields("A", ipv6),
+			];
 			writer.AddDocument(doc);
 			writer.Commit();
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			Sort sort = new Sort([..IPAddressField.CreateSortField("A")]);
 			TopFieldCollector collector = TopFieldCollector.Create(sort, 10, true, true, true, true);
@@ -556,10 +536,7 @@ namespace Lucene.Net.Index
         [TestMethod]
         public void IPAddressFieldSortTest()
         {
-            DirectoryInfo dir = new DirectoryInfo("test");
-            if (dir.Exists)
-                dir.Delete(true);
-            using FSDirectory directory = FSDirectory.Open(dir);
+            using RAMDirectory directory = new RAMDirectory();
             Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
             IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
                 .SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -570,18 +547,21 @@ namespace Lucene.Net.Index
 			{
                 Document doc = [
 					..IPAddressField.CreateFields("A", IPAddress.Parse("192.168.0.4"), Field.Store.YES),
+					..IPAddressField.CreateSortValueFields("A", IPAddress.Parse("192.168.0.4")),
 				];
                 writer.AddDocument(doc);
             }
             {
                 Document doc = [
                     ..IPAddressField.CreateFields("A", IPAddress.Parse("192.168.0.6"), Field.Store.YES),
+                    ..IPAddressField.CreateSortValueFields("A", IPAddress.Parse("192.168.0.6")),
                 ];
                 writer.AddDocument(doc);
             }
             {
                 Document doc = [
                     ..IPAddressField.CreateFields("A", IPAddress.Parse("192.168.0.5"), Field.Store.YES),
+                    ..IPAddressField.CreateSortValueFields("A", IPAddress.Parse("192.168.0.5")),
                 ];
                 writer.AddDocument(doc);
             }
@@ -589,7 +569,8 @@ namespace Lucene.Net.Index
             writer.ForceMerge(1);
 
             using SearcherManager searcherManager = new SearcherManager(directory, null);
-            IndexSearcher searcher = searcherManager.Acquire();
+            using SearcherLease lease = new SearcherLease(searcherManager);
+            IndexSearcher searcher = lease.Searcher;
 
             Sort sort = new Sort([.. IPAddressField.CreateSortField("A")]);
             TopFieldCollector collector = TopFieldCollector.Create(sort, 10, true, true, true, true);
@@ -605,10 +586,7 @@ namespace Lucene.Net.Index
         [TestMethod]
 		public void DecimalFieldTest()
 		{
-            DirectoryInfo dir = new DirectoryInfo("test");
-            if (dir.Exists)
-                dir.Delete(true);
-            using FSDirectory directory = FSDirectory.Open(dir);
+            using RAMDirectory directory = new RAMDirectory();
             Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
             IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
                 .SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -617,16 +595,20 @@ namespace Lucene.Net.Index
 
             writer.Commit();
 
-			Document doc = [.. DecimalField.CreateFields("A", 123, Field.Store.YES)];
+			Document doc =
+			[
+				.. DecimalField.CreateFields("A", 123, Field.Store.YES),
+				.. DecimalField.CreateSortValueFields("A", 123),
+			];
             writer.AddDocument(doc);
             writer.Commit();
             writer.ForceMerge(1);
 
             using SearcherManager searcherManager = new SearcherManager(directory, null);
-            IndexSearcher searcher = searcherManager.Acquire();
+            using SearcherLease lease = new SearcherLease(searcherManager);
+            IndexSearcher searcher = lease.Searcher;
 
-            SortField field = new SortField("A", SortFieldType.INT32);
-            Sort sort = new Sort(field);
+            Sort sort = new Sort([.. DecimalField.CreateSortField("A")]);
             TopFieldCollector collector = TopFieldCollector.Create(sort, 10, true, true, true, true);
             searcher.Search(new MatchAllDocsQuery(), collector);
             TopDocs topDocs = collector.GetTopDocs();
@@ -640,10 +622,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void DecimalFieldRangeQueryTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -660,7 +639,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			Query inclusive = DecimalField.NewRangeQuery("amount", 10.5m, 30.25m);
 			TopDocs inclusiveHits = searcher.Search(inclusive, 10);
@@ -701,10 +681,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void IPAddressFieldRangeQueryTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -721,7 +698,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			Query inclusive = IPAddressField.NewRangeQuery(
 				"ip",
@@ -766,10 +744,7 @@ namespace Lucene.Net.Index
 		[TestMethod]
 		public void IPAddressFieldIPv6RangeQueryTest()
 		{
-			DirectoryInfo dir = new DirectoryInfo("test");
-			if (dir.Exists)
-				dir.Delete(true);
-			using FSDirectory directory = FSDirectory.Open(dir);
+			using RAMDirectory directory = new RAMDirectory();
 			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
 			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
 				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
@@ -786,7 +761,8 @@ namespace Lucene.Net.Index
 			writer.ForceMerge(1);
 
 			using SearcherManager searcherManager = new SearcherManager(directory, null);
-			IndexSearcher searcher = searcherManager.Acquire();
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
 
 			Query inclusive = IPAddressField.NewRangeQuery(
 				"ip",
@@ -807,6 +783,113 @@ namespace Lucene.Net.Index
 			TopDocs exclusiveHits = searcher.Search(exclusive, 10);
 			Assert.AreEqual(1, exclusiveHits.TotalHits);
 			Assert.AreEqual(IPAddress.Parse("2001:db8::10"), searcher.Doc(exclusiveHits.ScoreDocs[0].Doc).GetIPAddressValue("ip"));
+		}
+
+		[TestMethod]
+		public void IPAddressFieldFamilyDisambiguationTest()
+		{
+			using RAMDirectory directory = new RAMDirectory();
+			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
+			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
+				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
+				.SetMergePolicy(new TieredMergePolicy());
+			using IndexWriter writer = new IndexWriter(directory, config);
+
+			writer.Commit();
+			Document loopbackV6 = [.. IPAddressField.CreateFields("ip", IPAddress.Parse("::1"), Field.Store.YES)];
+			Document ipv4 = [.. IPAddressField.CreateFields("ip", IPAddress.Parse("0.0.0.1"), Field.Store.YES)];
+			Document mapped = [.. IPAddressField.CreateFields("ip", IPAddress.Parse("::ffff:192.168.0.10"), Field.Store.YES)];
+			Document ipv4Equivalent = [.. IPAddressField.CreateFields("ip", IPAddress.Parse("192.168.0.10"), Field.Store.YES)];
+			writer.AddDocument(loopbackV6);
+			writer.AddDocument(ipv4);
+			writer.AddDocument(mapped);
+			writer.AddDocument(ipv4Equivalent);
+			writer.Commit();
+			writer.ForceMerge(1);
+
+			using SearcherManager searcherManager = new SearcherManager(directory, null);
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
+
+			Assert.AreEqual(1, searcher.Search(IPAddressField.NewExactQuery("ip", IPAddress.Parse("::1")), 10).TotalHits);
+			Assert.AreEqual(1, searcher.Search(IPAddressField.NewExactQuery("ip", IPAddress.Parse("0.0.0.1")), 10).TotalHits);
+			Assert.AreEqual(2, searcher.Search(IPAddressField.NewExactQuery("ip", IPAddress.Parse("192.168.0.10")), 10).TotalHits);
+			Assert.AreEqual(2, searcher.Search(IPAddressField.NewExactQuery("ip", IPAddress.Parse("::ffff:192.168.0.10")), 10).TotalHits);
+
+			Document storedLoopback = searcher.Doc(searcher.Search(IPAddressField.NewExactQuery("ip", IPAddress.Parse("::1")), 1).ScoreDocs[0].Doc);
+			Assert.AreEqual(IPAddress.Parse("::1"), storedLoopback.GetIPAddressValue("ip"));
+		}
+
+		[TestMethod]
+		public void IPAddressFieldMultiValueNoCrossProductTest()
+		{
+			using RAMDirectory directory = new RAMDirectory();
+			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
+			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
+				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
+				.SetMergePolicy(new TieredMergePolicy());
+			using IndexWriter writer = new IndexWriter(directory, config);
+
+			writer.Commit();
+			// Cross-product trap under limb AND: (high=5-ish, low=small) + (high=3-ish, low=large)
+			Document doc =
+			[
+				.. IPAddressField.CreateFields("ip", IPAddress.Parse("192.168.0.5"), Field.Store.YES),
+				.. IPAddressField.CreateFields("ip", IPAddress.Parse("10.0.0.100"), Field.Store.YES),
+			];
+			writer.AddDocument(doc);
+			writer.Commit();
+			writer.ForceMerge(1);
+
+			using SearcherManager searcherManager = new SearcherManager(directory, null);
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
+
+			// Would false-positive if high of 192.168.0.5 were ANDed with low of 10.0.0.100.
+			Query shouldMiss = IPAddressField.NewExactQuery("ip", IPAddress.Parse("192.168.0.100"));
+			Assert.AreEqual(0, searcher.Search(shouldMiss, 10).TotalHits);
+
+			Query shouldHit = IPAddressField.NewExactQuery("ip", IPAddress.Parse("192.168.0.5"));
+			Assert.AreEqual(1, searcher.Search(shouldHit, 10).TotalHits);
+
+			Document stored = searcher.Doc(searcher.Search(new MatchAllDocsQuery(), 1).ScoreDocs[0].Doc);
+			CollectionAssert.AreEquivalent(
+				new[] { "192.168.0.5", "10.0.0.100" },
+				stored.GetIPAddressValues("ip").Select(static ip => ip.ToString()).ToArray());
+		}
+
+		[TestMethod]
+		public void DecimalFieldMultiValueNoCrossProductTest()
+		{
+			using RAMDirectory directory = new RAMDirectory();
+			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
+			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
+				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
+				.SetMergePolicy(new TieredMergePolicy());
+			using IndexWriter writer = new IndexWriter(directory, config);
+
+			writer.Commit();
+			Document doc =
+			[
+				.. DecimalField.CreateFields("amount", 5.0m, Field.Store.YES),
+				.. DecimalField.CreateFields("amount", 100.0m, Field.Store.YES),
+			];
+			writer.AddDocument(doc);
+			writer.Commit();
+			writer.ForceMerge(1);
+
+			using SearcherManager searcherManager = new SearcherManager(directory, null);
+			using SearcherLease lease = new SearcherLease(searcherManager);
+			IndexSearcher searcher = lease.Searcher;
+
+			Assert.AreEqual(0, searcher.Search(DecimalField.NewExactQuery("amount", 50.0m), 10).TotalHits);
+			Assert.AreEqual(1, searcher.Search(DecimalField.NewExactQuery("amount", 5.0m), 10).TotalHits);
+			Assert.AreEqual(1, searcher.Search(DecimalField.NewExactQuery("amount", 5.00m), 10).TotalHits);
+
+			Document stored = searcher.Doc(searcher.Search(new MatchAllDocsQuery(), 1).ScoreDocs[0].Doc);
+			CollectionAssert.AreEquivalent(
+				new[] { 5.0m, 100.0m },
+				stored.GetDecimalValues("amount").ToArray());
 		}
 
 		private static HashSet<decimal> GetDecimalValues(IndexSearcher searcher, TopDocs hits, string fieldName)
