@@ -135,8 +135,7 @@ namespace Lucene.Net.Documents
 		public static Query NewRangeQuery(string name, byte[]? minBytes, byte[]? maxBytes, bool minInclusive = true, bool maxInclusive = true, int precisionStep = SortableBytesNumericUtils.PrecisionStepDefault)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(name);
-			if (precisionStep < 1)
-				throw new ArgumentOutOfRangeException(nameof(precisionStep));
+			ArgumentOutOfRangeException.ThrowIfLessThan(precisionStep, 1);
 			if (minBytes is null && maxBytes is null)
 				return NewExistsQuery(name);
 			if (minBytes is { Length: 0 })

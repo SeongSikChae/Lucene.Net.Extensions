@@ -4,6 +4,7 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<RootNamespace />
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -17,12 +18,12 @@
 		<PackageProjectUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<Version>4.8.0-beta00018-4</Version>
+		<Version>4.8.0-beta00018-5</Version>
 		<AssemblyName>Biz.Bizadm.$(MSBuildProjectName)</AssemblyName>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<Description>.NET 각 데이터 타입을 기반으로 인덱싱하고 검색 할 수 있게 기능 확장</Description>
-		<NoWarn>$(NoWarn);IDE0090</NoWarn>
+		<NoWarn>$(NoWarn);IDE0090;IDE0290</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
