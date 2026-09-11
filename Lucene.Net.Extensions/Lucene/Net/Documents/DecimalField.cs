@@ -42,12 +42,7 @@ namespace Lucene.Net.Documents
         /// <param name="reverse">Whether to reverse the sort order.</param>
         public static IEnumerable<SortField> CreateSortField(string name, bool reverse = false)
         {
-            yield return new SortField(name + LowPartSuffix, SortFieldType.INT32, reverse);
-            yield return new SortField(name + MidPartSuffix, SortFieldType.INT32, reverse);
-            yield return new SortField(name + HighPartSuffix, SortFieldType.INT32, reverse);
-            yield return new SortField(name, SortFieldType.INT32, reverse);
-            foreach (SortField f in DecimalSortableField.CreateSortField(name, reverse))
-                yield return f;
+            return DecimalSortableField.CreateSortField(name, reverse);
         }
 
         /// <summary>
@@ -89,7 +84,7 @@ namespace Lucene.Net.Documents
         /// Field names: <c>{name}_S0</c> (most significant), <c>{name}_S1</c>, <c>{name}_S2</c> (least significant).
         /// Keep using <see cref="DecimalField"/> for stored exact bits; use these limbs for range / exists / sort.
         /// </remarks>
-        public static class DecimalSortableField
+        private static class DecimalSortableField
         {
             /// <summary>Number of Int64 limbs in the sortable encoding.</summary>
             private const int LimbCount = 3;

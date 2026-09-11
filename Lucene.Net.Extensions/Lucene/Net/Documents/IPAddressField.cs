@@ -145,17 +145,17 @@ namespace Lucene.Net.Documents
 			return false;
 		}
 
-		private static Query CreateLexicographicRangeQuery(string highField, string lowField, long startHigh, long startLow, long endHigh, long endLow)
+		private static BooleanQuery CreateLexicographicRangeQuery(string highField, string lowField, long startHigh, long startLow, long endHigh, long endLow)
 		{
 			int cmpHigh = startHigh.CompareTo(endHigh);
 			if (cmpHigh > 0)
-				return new BooleanQuery();
+				return [];
 
 			if (cmpHigh == 0)
 			{
 				int cmpLow = startLow.CompareTo(endLow);
 				if (cmpLow > 0)
-					return new BooleanQuery();
+					return [];
 
 				return new BooleanQuery
 				{
