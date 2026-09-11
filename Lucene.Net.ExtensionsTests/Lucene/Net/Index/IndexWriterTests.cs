@@ -11,6 +11,11 @@ namespace Lucene.Net.Index
 	[TestClass]
 	public class IndexWriterTests
 	{
+		private static readonly decimal[] DecimalRangeInclusiveExpected = [10.5m, 20.0m, 30.25m];
+		private static readonly decimal[] DecimalRangeOpenMinExpected = [-5.5m, 10.5m];
+		private static readonly decimal[] DecimalRangeOpenMaxExpected = [30.25m, 100.99m];
+		private static readonly string[] IPAddressRangeInclusiveExpected = ["192.168.0.1", "192.168.0.10", "192.168.0.100"];
+		private static readonly string[] IPAddressIPv6RangeInclusiveExpected = ["2001:db8::1", "2001:db8::10", "2001:db8::100"];
 		[TestMethod]
 		public void SByteFieldTest()
 		{
@@ -631,5 +636,201 @@ namespace Lucene.Net.Index
 			Assert.IsNotNull(value);
 			Assert.AreEqual(123, value.Value);
         }
+
+		[TestMethod]
+		public void DecimalFieldRangeQueryTest()
+		{
+			DirectoryInfo dir = new DirectoryInfo("test");
+			if (dir.Exists)
+				dir.Delete(true);
+			using FSDirectory directory = FSDirectory.Open(dir);
+			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
+			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
+				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
+				.SetMergePolicy(new TieredMergePolicy());
+			using IndexWriter writer = new IndexWriter(directory, config);
+
+			writer.Commit();
+			foreach (decimal amount in new[] { -5.5m, 10.5m, 20.0m, 30.25m, 100.99m })
+			{
+				Document doc = [.. DecimalField.CreateFields("amount", amount, Field.Store.YES)];
+				writer.AddDocument(doc);
+			}
+			writer.Commit();
+			writer.ForceMerge(1);
+
+			using SearcherManager searcherManager = new SearcherManager(directory, null);
+			IndexSearcher searcher = searcherManager.Acquire();
+
+			Query inclusive = DecimalField.NewRangeQuery("amount", 10.5m, 30.25m);
+			TopDocs inclusiveHits = searcher.Search(inclusive, 10);
+			Assert.AreEqual(3, inclusiveHits.TotalHits);
+			HashSet<decimal> inclusiveValues = GetDecimalValues(searcher, inclusiveHits, "amount");
+			CollectionAssert.AreEquivalent(DecimalRangeInclusiveExpected, inclusiveValues.ToArray());
+
+			Query exclusive = DecimalField.NewRangeQuery("amount", 10.5m, 30.25m, minInclusive: false, maxInclusive: false);
+			TopDocs exclusiveHits = searcher.Search(exclusive, 10);
+			Assert.AreEqual(1, exclusiveHits.TotalHits);
+			Assert.AreEqual(20.0m, searcher.Doc(exclusiveHits.ScoreDocs[0].Doc).GetDecimalValue("amount"));
+
+			Query openMin = DecimalField.NewRangeQuery("amount", null, 10.5m);
+			TopDocs openMinHits = searcher.Search(openMin, 10);
+			Assert.AreEqual(2, openMinHits.TotalHits);
+			CollectionAssert.AreEquivalent(
+				DecimalRangeOpenMinExpected,
+				GetDecimalValues(searcher, openMinHits, "amount").ToArray());
+
+			Query openMax = DecimalField.NewRangeQuery("amount", 30.25m, null);
+			TopDocs openMaxHits = searcher.Search(openMax, 10);
+			Assert.AreEqual(2, openMaxHits.TotalHits);
+			CollectionAssert.AreEquivalent(
+				DecimalRangeOpenMaxExpected,
+				GetDecimalValues(searcher, openMaxHits, "amount").ToArray());
+
+			Query exact = DecimalField.NewExactQuery("amount", 20.0m);
+			TopDocs exactHits = searcher.Search(exact, 10);
+			Assert.AreEqual(1, exactHits.TotalHits);
+			Assert.AreEqual(20.0m, searcher.Doc(exactHits.ScoreDocs[0].Doc).GetDecimalValue("amount"));
+			Assert.AreEqual(1, searcher.Search(DecimalField.NewExactQuery("amount", 20.00m), 10).TotalHits);
+
+			Query exists = DecimalField.NewExistsQuery("amount");
+			TopDocs existsHits = searcher.Search(exists, 10);
+			Assert.AreEqual(5, existsHits.TotalHits);
+		}
+
+		[TestMethod]
+		public void IPAddressFieldRangeQueryTest()
+		{
+			DirectoryInfo dir = new DirectoryInfo("test");
+			if (dir.Exists)
+				dir.Delete(true);
+			using FSDirectory directory = FSDirectory.Open(dir);
+			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
+			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
+				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
+				.SetMergePolicy(new TieredMergePolicy());
+			using IndexWriter writer = new IndexWriter(directory, config);
+
+			writer.Commit();
+			foreach (string ip in new[] { "10.0.0.1", "192.168.0.1", "192.168.0.10", "192.168.0.100", "192.168.1.1" })
+			{
+				Document doc = [.. IPAddressField.CreateFields("ip", IPAddress.Parse(ip), Field.Store.YES)];
+				writer.AddDocument(doc);
+			}
+			writer.Commit();
+			writer.ForceMerge(1);
+
+			using SearcherManager searcherManager = new SearcherManager(directory, null);
+			IndexSearcher searcher = searcherManager.Acquire();
+
+			Query inclusive = IPAddressField.NewRangeQuery(
+				"ip",
+				IPAddress.Parse("192.168.0.1"),
+				IPAddress.Parse("192.168.0.100"));
+			TopDocs inclusiveHits = searcher.Search(inclusive, 10);
+			Assert.AreEqual(3, inclusiveHits.TotalHits);
+			CollectionAssert.AreEquivalent(
+				IPAddressRangeInclusiveExpected,
+				GetIPAddressValues(searcher, inclusiveHits, "ip").ToArray());
+
+			Query exclusive = IPAddressField.NewRangeQuery(
+				"ip",
+				IPAddress.Parse("192.168.0.1"),
+				IPAddress.Parse("192.168.0.100"),
+				minInclusive: false,
+				maxInclusive: false);
+			TopDocs exclusiveHits = searcher.Search(exclusive, 10);
+			Assert.AreEqual(1, exclusiveHits.TotalHits);
+			Assert.AreEqual("192.168.0.10", searcher.Doc(exclusiveHits.ScoreDocs[0].Doc).GetIPAddressValue("ip")!.ToString());
+
+			Query openMin = IPAddressField.NewRangeQuery("ip", null, IPAddress.Parse("10.0.0.1"));
+			TopDocs openMinHits = searcher.Search(openMin, 10);
+			Assert.AreEqual(1, openMinHits.TotalHits);
+			Assert.AreEqual("10.0.0.1", searcher.Doc(openMinHits.ScoreDocs[0].Doc).GetIPAddressValue("ip")!.ToString());
+
+			Query openMax = IPAddressField.NewRangeQuery("ip", IPAddress.Parse("192.168.1.1"), null);
+			TopDocs openMaxHits = searcher.Search(openMax, 10);
+			Assert.AreEqual(1, openMaxHits.TotalHits);
+			Assert.AreEqual("192.168.1.1", searcher.Doc(openMaxHits.ScoreDocs[0].Doc).GetIPAddressValue("ip")!.ToString());
+
+			Query exact = IPAddressField.NewExactQuery("ip", IPAddress.Parse("192.168.0.10"));
+			TopDocs exactHits = searcher.Search(exact, 10);
+			Assert.AreEqual(1, exactHits.TotalHits);
+			Assert.AreEqual("192.168.0.10", searcher.Doc(exactHits.ScoreDocs[0].Doc).GetIPAddressValue("ip")!.ToString());
+
+			Query exists = IPAddressField.NewExistsQuery("ip");
+			TopDocs existsHits = searcher.Search(exists, 10);
+			Assert.AreEqual(5, existsHits.TotalHits);
+		}
+
+		[TestMethod]
+		public void IPAddressFieldIPv6RangeQueryTest()
+		{
+			DirectoryInfo dir = new DirectoryInfo("test");
+			if (dir.Exists)
+				dir.Delete(true);
+			using FSDirectory directory = FSDirectory.Open(dir);
+			Analyzer analyzer = new StandardAnalyzer(Util.LuceneVersion.LUCENE_48);
+			IndexWriterConfig config = new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, analyzer)
+				.SetOpenMode(OpenMode.CREATE_OR_APPEND).SetRAMBufferSizeMB(1)
+				.SetMergePolicy(new TieredMergePolicy());
+			using IndexWriter writer = new IndexWriter(directory, config);
+
+			writer.Commit();
+			foreach (string ip in new[] { "2001:db8::1", "2001:db8::10", "2001:db8::100", "2001:db9::1" })
+			{
+				Document doc = [.. IPAddressField.CreateFields("ip", IPAddress.Parse(ip), Field.Store.YES)];
+				writer.AddDocument(doc);
+			}
+			writer.Commit();
+			writer.ForceMerge(1);
+
+			using SearcherManager searcherManager = new SearcherManager(directory, null);
+			IndexSearcher searcher = searcherManager.Acquire();
+
+			Query inclusive = IPAddressField.NewRangeQuery(
+				"ip",
+				IPAddress.Parse("2001:db8::1"),
+				IPAddress.Parse("2001:db8::100"));
+			TopDocs inclusiveHits = searcher.Search(inclusive, 10);
+			Assert.AreEqual(3, inclusiveHits.TotalHits);
+			CollectionAssert.AreEquivalent(
+				IPAddressIPv6RangeInclusiveExpected,
+				GetIPAddressValues(searcher, inclusiveHits, "ip").ToArray());
+
+			Query exclusive = IPAddressField.NewRangeQuery(
+				"ip",
+				IPAddress.Parse("2001:db8::1"),
+				IPAddress.Parse("2001:db8::100"),
+				minInclusive: false,
+				maxInclusive: false);
+			TopDocs exclusiveHits = searcher.Search(exclusive, 10);
+			Assert.AreEqual(1, exclusiveHits.TotalHits);
+			Assert.AreEqual(IPAddress.Parse("2001:db8::10"), searcher.Doc(exclusiveHits.ScoreDocs[0].Doc).GetIPAddressValue("ip"));
+		}
+
+		private static HashSet<decimal> GetDecimalValues(IndexSearcher searcher, TopDocs hits, string fieldName)
+		{
+			HashSet<decimal> values = [];
+			foreach (ScoreDoc scoreDoc in hits.ScoreDocs)
+			{
+				decimal? value = searcher.Doc(scoreDoc.Doc).GetDecimalValue(fieldName);
+				Assert.IsNotNull(value);
+				values.Add(value.Value);
+			}
+			return values;
+		}
+
+		private static HashSet<string> GetIPAddressValues(IndexSearcher searcher, TopDocs hits, string fieldName)
+		{
+			HashSet<string> values = [];
+			foreach (ScoreDoc scoreDoc in hits.ScoreDocs)
+			{
+				IPAddress? value = searcher.Doc(scoreDoc.Doc).GetIPAddressValue(fieldName);
+				Assert.IsNotNull(value);
+				values.Add(value.ToString());
+			}
+			return values;
+		}
 	}
 }

@@ -4,8 +4,14 @@ namespace Lucene.Net.Index
 {
 	using Documents;
 
+	/// <summary>
+	/// Extension methods for reading typed numeric values from an <see cref="IIndexableField"/>.
+	/// </summary>
 	public static class IndexableFieldExtensions
 	{
+		/// <summary>
+		/// Reads an <see cref="sbyte"/> stored via order-preserving conversion from <see cref="byte"/>.
+		/// </summary>
 		public static sbyte? GetSByteValue(this IIndexableField field)
 		{
 			byte? v = field.GetByteValue();
@@ -14,6 +20,9 @@ namespace Lucene.Net.Index
 			return v.Value.ToSByte();
 		}
 
+		/// <summary>
+		/// Reads a <see cref="ushort"/> stored via order-preserving conversion from <see cref="short"/>.
+		/// </summary>
 		public static ushort? GetUInt16Value(this IIndexableField field)
 		{
 			short? v = field.GetInt16Value();
@@ -22,6 +31,9 @@ namespace Lucene.Net.Index
 			return v.Value.ToUInt16();
 		}
 
+		/// <summary>
+		/// Reads a <see cref="uint"/> stored via order-preserving conversion from <see cref="int"/>.
+		/// </summary>
 		public static uint? GetUInt32Value(this IIndexableField field)
 		{
 			int? v = field.GetInt32Value();
@@ -30,6 +42,9 @@ namespace Lucene.Net.Index
 			return v.Value.ToUInt32();
 		}
 
+		/// <summary>
+		/// Reads a <see cref="ulong"/> stored via order-preserving conversion from <see cref="long"/>.
+		/// </summary>
 		public static ulong? GetUInt64Value(this IIndexableField field)
 		{
 			long? v = field.GetInt64Value();
@@ -38,6 +53,9 @@ namespace Lucene.Net.Index
 			return v.Value.ToUInt64();
 		}
 
+		/// <summary>
+		/// Reads a <see cref="Half"/> stored as <see cref="float"/>.
+		/// </summary>
 		public static Half? GetHalfValue(this IIndexableField field)
 		{
 			float? v = field.GetSingleValue();
@@ -46,6 +64,9 @@ namespace Lucene.Net.Index
 			return (Half)v.Value;
 		}
 
+		/// <summary>
+		/// Reads an <see cref="IPAddress"/> from the high limb field plus the matching low limb on <paramref name="document"/>.
+		/// </summary>
 		public static IPAddress? GetIPAddressValue(this IIndexableField field, Document document)
 		{
             long? high = field.GetInt64Value();
@@ -62,6 +83,9 @@ namespace Lucene.Net.Index
             return IPAddressExtensions.ToIPAddress(high.Value, low.Value);
         }
 
+		/// <summary>
+		/// Reads a <see cref="decimal"/> from the flags field plus the matching GetBits parts on <paramref name="document"/>.
+		/// </summary>
 		public static decimal? GetDecimalValue(this IIndexableField field, Document document)
 		{
 			IIndexableField? lowField = document.GetField(field.Name + DecimalField.LowPartSuffix);

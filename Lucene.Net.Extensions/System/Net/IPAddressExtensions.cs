@@ -3,10 +3,19 @@ using System.Net.Sockets;
 
 namespace System.Net
 {
+	/// <summary>
+	/// Helpers for encoding <see cref="IPAddress"/> values as ordered Int64 pairs for Lucene.
+	/// </summary>
 	public static class IPAddressExtensions
 	{
+		/// <summary>
+		/// Suffix appended to the base field name for the low Int64 limb.
+		/// </summary>
 		public const string LowPartSuffix = "_L";
 
+		/// <summary>
+		/// Maps IPv4-mapped IPv6 addresses to IPv4 so the same address has a single storage form.
+		/// </summary>
 		public static IPAddress NormalizeForStorage(this IPAddress address)
 		{
 			if (address.AddressFamily == AddressFamily.InterNetworkV6 && address.IsIPv4MappedToIPv6)
@@ -14,6 +23,12 @@ namespace System.Net
 			return address;
 		}
 
+		/// <summary>
+		/// Splits an IPv4/IPv6 address into order-preserving high/low Int64 limbs.
+		/// </summary>
+		/// <param name="address">Address to encode (IPv4 or IPv6).</param>
+		/// <param name="high">Most significant 64 bits (0 for IPv4).</param>
+		/// <param name="low">Least significant 64 bits.</param>
 		public static void ToInt64Pair(this IPAddress address, out long high, out long low)
 		{
 			if (!(address.AddressFamily == AddressFamily.InterNetwork || address.AddressFamily == AddressFamily.InterNetworkV6))
@@ -40,6 +55,9 @@ namespace System.Net
 			low = lo.ToInt64();
 		}
 
+		/// <summary>
+		/// Reconstructs an <see cref="IPAddress"/> from high/low Int64 limbs produced by <see cref="ToInt64Pair"/>.
+		/// </summary>
 		public static IPAddress ToIPAddress(long high, long low)
 		{
             ulong h = high.ToUInt64();

@@ -1,7 +1,14 @@
 ﻿namespace Lucene.Net.Documents
 {
+	/// <summary>
+	/// Field that indexes an <see cref="sbyte"/> value for efficient filtering and sorting.
+	/// Values are stored via unsigned-order-preserving conversion to <see cref="byte"/>.
+	/// </summary>
 	public sealed class SByteField : Field
 	{
+		/// <summary>
+		/// Type for an <see cref="SByteField"/> that is indexed and stored.
+		/// </summary>
 		public static readonly FieldType TYPE_STORED = new FieldType
 		{
 			DocValueType = Net.Index.DocValuesType.NONE,
@@ -18,6 +25,9 @@
 			StoreTermVectors = false
 		}.Freeze();
 
+		/// <summary>
+		/// Type for an <see cref="SByteField"/> that is indexed but not stored.
+		/// </summary>
 		public static readonly FieldType TYPE_NOT_STORED = new FieldType
 		{
 			DocValueType = Net.Index.DocValuesType.NONE,
@@ -34,6 +44,12 @@
 			StoreTermVectors = false
 		}.Freeze();
 
+		/// <summary>
+		/// Creates a new <see cref="SByteField"/>.
+		/// </summary>
+		/// <param name="name">Field name.</param>
+		/// <param name="value">Field value.</param>
+		/// <param name="stored">Whether to store the value.</param>
 		public SByteField(string name, sbyte value, Store stored) : base(name, stored == Store.YES ? TYPE_STORED : TYPE_NOT_STORED)
 		{
 			FieldsData = J2N.Numerics.Byte.GetInstance(value.ToByte());

@@ -12,6 +12,7 @@
     <TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
     <RootNamespace />
     <AssemblyName>Biz.Bizadm.$(MSBuildProjectName)</AssemblyName>
+    <NoWarn>$(NoWarn);IDE0090</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
