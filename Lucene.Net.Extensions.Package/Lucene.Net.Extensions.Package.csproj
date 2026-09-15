@@ -4,6 +4,8 @@
     <IsPackable>true</IsPackable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageId>Biz.Bizadm.Lucene.Net.Extensions</PackageId>
     <Version>4.8.0-beta00018-6</Version>
     <Authors>SeongSikChae</Authors>
@@ -37,19 +39,34 @@
     <None Include="..\Lucene.Net.Extensions\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.dll"
           Pack="true"
           PackagePath="lib\net10.0" />
+    <None Include="..\Lucene.Net.Extensions\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.pdb"
+          Pack="true"
+          PackagePath="lib\net10.0" />
     <None Include="..\Lucene.Net.Extensions\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.xml"
           Pack="true"
           PackagePath="lib\net10.0" />
     <None Include="..\Lucene.Net.Extensions\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.dll"
           Pack="true"
           PackagePath="runtimes\win\lib\net10.0;runtimes\linux\lib\net10.0;runtimes\osx\lib\net10.0" />
+    <None Include="..\Lucene.Net.Extensions\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.pdb"
+          Pack="true"
+          PackagePath="runtimes\win\lib\net10.0;runtimes\linux\lib\net10.0;runtimes\osx\lib\net10.0" />
     <None Include="..\Lucene.Net.Extensions.Runtime.Windows\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.Runtime.dll"
+          Pack="true"
+          PackagePath="runtimes\win\lib\net10.0" />
+    <None Include="..\Lucene.Net.Extensions.Runtime.Windows\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.Runtime.pdb"
           Pack="true"
           PackagePath="runtimes\win\lib\net10.0" />
     <None Include="..\Lucene.Net.Extensions.Runtime.Unix\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.Runtime.dll"
           Pack="true"
           PackagePath="runtimes\linux\lib\net10.0" />
+    <None Include="..\Lucene.Net.Extensions.Runtime.Unix\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.Runtime.pdb"
+          Pack="true"
+          PackagePath="runtimes\linux\lib\net10.0" />
     <None Include="..\Lucene.Net.Extensions.Runtime.Unix\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.Runtime.dll"
+          Pack="true"
+          PackagePath="runtimes\osx\lib\net10.0" />
+    <None Include="..\Lucene.Net.Extensions.Runtime.Unix\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.Runtime.pdb"
           Pack="true"
           PackagePath="runtimes\osx\lib\net10.0" />
   </ItemGroup>
