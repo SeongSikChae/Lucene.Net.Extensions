@@ -6,7 +6,7 @@ namespace Lucene.Net.Store;
 /// Creates Lucene-compatible already-closed exceptions when the Lucene type is accessible,
 /// otherwise falls back to <see cref="ObjectDisposedException"/> (also recognized by many Lucene paths).
 /// </summary>
-internal static class LuceneCloseExceptions
+public static class LuceneCloseExceptions
 {
 	private static readonly Func<string?, string?, Exception> Factory = CreateFactory();
 	private static readonly Func<Exception, bool> IsAlreadyClosedCore = CreateIsAlreadyClosed();

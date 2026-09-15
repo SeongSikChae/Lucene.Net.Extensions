@@ -10,7 +10,7 @@ namespace Lucene.Net.Documents
 	/// Indexes fixed-width sortable bytes as a prefix-coded trie (multi-value safe range/exact)
 	/// and stores optional raw payloads. Sorting uses a separate single-value SortedDocValues field.
 	/// </summary>
-	internal static class SortableBytesField
+	public static class SortableBytesField
 	{
 		/// <summary>Suffix for the single-value sort field (reserved; avoid colliding user field names).</summary>
 		public const string SortFieldSuffix = "_$Sort";

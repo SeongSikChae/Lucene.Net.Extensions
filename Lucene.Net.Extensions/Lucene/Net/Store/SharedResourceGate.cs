@@ -4,7 +4,7 @@ namespace Lucene.Net.Store;
 /// Shared lifetime for a native/file resource used by multiple IndexInput clones.
 /// Ownership refs keep the resource alive; active readers block final teardown.
 /// </summary>
-internal sealed class SharedResourceGate
+public sealed class SharedResourceGate
 {
 	private int _owners = 1;
 	private int _readers;
@@ -65,7 +65,7 @@ internal sealed class SharedResourceGate
 			_noReaders.Set();
 	}
 
-	internal ref struct ReaderScope
+	public ref struct ReaderScope
 	{
 		private SharedResourceGate? _gate;
 
