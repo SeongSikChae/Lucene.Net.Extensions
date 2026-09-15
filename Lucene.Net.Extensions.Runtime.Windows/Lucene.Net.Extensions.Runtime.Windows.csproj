@@ -1,33 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>Biz.Bizadm.Lucene.Net.Extensions.Runtime</AssemblyName>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Version>4.8.0-beta00018-6</Version>
-    <PackageId>Lucene.Net.Extensions.Runtime.Windows</PackageId>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RootNamespace />
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\\Lucene.Net.Extensions\\Lucene.Net.Extensions.csproj" />
+    <Compile Remove="Lucene\Net\Store\Native\WindowsMemory.cs" />
+    <ProjectReference Include="..\Lucene.Net.Extensions\Lucene.Net.Extensions.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\\LICENSE">
-      <Pack>true</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\\README.md">
-      <Pack>true</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-
 </Project>

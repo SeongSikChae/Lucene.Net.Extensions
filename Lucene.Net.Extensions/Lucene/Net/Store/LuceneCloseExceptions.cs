@@ -11,9 +11,11 @@ public static class LuceneCloseExceptions
 	private static readonly Func<string?, string?, Exception> Factory = CreateFactory();
 	private static readonly Func<Exception, bool> IsAlreadyClosedCore = CreateIsAlreadyClosed();
 
+	/// <inheritdoc />
 	public static Exception AlreadyClosed(string? objectName, string message) =>
 		Factory(objectName, message);
 
+	/// <inheritdoc />
 	public static bool IsAlreadyClosed(Exception ex) => IsAlreadyClosedCore(ex);
 
 	private static Func<string?, string?, Exception> CreateFactory()

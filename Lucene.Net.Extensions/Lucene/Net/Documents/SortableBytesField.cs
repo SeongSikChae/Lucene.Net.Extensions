@@ -49,12 +49,14 @@ namespace Lucene.Net.Documents
 			return type;
 		}
 
+		/// <inheritdoc />
 		public static string GetSortFieldName(string name)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(name);
 			return name + SortFieldSuffix;
 		}
 
+		/// <inheritdoc />
 		public static string GetExistsFieldName(string name)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -63,7 +65,7 @@ namespace Lucene.Net.Documents
 
 		/// <summary>
 		/// Creates indexed trie terms, an exists marker, and optional stored payload for search/round-trip.
-		/// Does not write the sort field — call <see cref="CreateSortValueFields"/> separately.
+		/// Does not write the sort field ??call <see cref="CreateSortValueFields"/> separately.
 		/// </summary>
 		/// <remarks>
 		/// <paramref name="storedBytes"/> may differ in length from <paramref name="indexedBytes"/>
@@ -92,6 +94,7 @@ namespace Lucene.Net.Documents
 			yield return new Field(name, stream, IndexedType);
 		}
 
+		/// <inheritdoc />
 		public static IEnumerable<Field> CreateFields(string name, byte[] bytes, Field.Store stored)
 			=> CreateFields(name, bytes, bytes, stored);
 
@@ -118,6 +121,7 @@ namespace Lucene.Net.Documents
 			return new SortField(GetSortFieldName(name), SortFieldType.STRING, reverse);
 		}
 
+		/// <inheritdoc />
 		public static Query NewExactQuery(string name, byte[] bytes)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -132,6 +136,7 @@ namespace Lucene.Net.Documents
 			return new TermQuery(new Term(name, term));
 		}
 
+		/// <inheritdoc />
 		public static Query NewRangeQuery(string name, byte[]? minBytes, byte[]? maxBytes, bool minInclusive = true, bool maxInclusive = true, int precisionStep = SortableBytesNumericUtils.PrecisionStepDefault)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(name);

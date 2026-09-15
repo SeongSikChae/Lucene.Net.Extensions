@@ -27,7 +27,7 @@ public abstract class WinFSDirectoryBase : FSDirectory
 	/// <summary>
 	/// Validates a slice against <paramref name="fileLength"/> without addition overflow.
 	/// </summary>
-	internal static void ValidateSlice(long fileLength, long offset, long length)
+	protected static void ValidateSlice(long fileLength, long offset, long length)
 	{
 		ArgumentOutOfRangeException.ThrowIfNegative(offset);
 		ArgumentOutOfRangeException.ThrowIfNegative(length);

@@ -7,15 +7,16 @@ namespace Lucene.Net.Store;
 /// Windows-tuned random-access reads (unified name for RID-based runtime selection).
 /// </summary>
 [SupportedOSPlatform("windows")]
-public sealed class RandomAccessDirectory : RandomAccessDirectoryBase
+internal sealed class RuntimeRandomAccessDirectory : RandomAccessDirectoryBase
 {
-	/// <summary>Default <see cref="BufferedIndexInput"/> buffer size for random-access reads.</summary>
-	public const int DefaultBufferSize = 8 * 1024;
+	/// <inheritdoc />
+	public RuntimeRandomAccessDirectory(DirectoryInfo path) : base(path, null) { }
+	/// <inheritdoc />
+	public RuntimeRandomAccessDirectory(DirectoryInfo path, LockFactory? lockFactory) : base(path, lockFactory) { }
+	/// <inheritdoc />
+	public RuntimeRandomAccessDirectory(string path) : this(new DirectoryInfo(path)) { }
 
-	public RandomAccessDirectory(DirectoryInfo path) : base(path, null) { }
-	public RandomAccessDirectory(DirectoryInfo path, LockFactory? lockFactory) : base(path, lockFactory) { }
-	public RandomAccessDirectory(string path) : this(new DirectoryInfo(path)) { }
-
+	/// <inheritdoc />
 	public override IndexInput OpenInput(string name, IOContext context)
 	{
 		EnsureOpen();
@@ -39,6 +40,7 @@ public sealed class RandomAccessDirectory : RandomAccessDirectoryBase
 		}
 	}
 
+	/// <inheritdoc />
 	public override IndexInputSlicer CreateSlicer(string name, IOContext context)
 	{
 		EnsureOpen();

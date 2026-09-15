@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lucene.Net.Extensions\Lucene.Net.Extensions.csproj" />
+    <ProjectReference Include="..\Lucene.Net.Extensions.Runtime.Windows\Lucene.Net.Extensions.Runtime.Windows.csproj" />
   </ItemGroup>
 
   <ItemGroup>

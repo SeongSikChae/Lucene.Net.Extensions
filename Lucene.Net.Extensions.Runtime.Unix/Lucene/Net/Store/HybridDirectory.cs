@@ -3,45 +3,49 @@ using System.Runtime.Versioning;
 namespace Lucene.Net.Store;
 
 /// <summary>
-/// Linux / macOS hybrid — large files use <see cref="MapDirectory"/>, smaller files use <see cref="RandomAccessDirectory"/>.
-/// (unified name for RID-based runtime selection)
+/// Linux / macOS hybrid implementation: large files use memory mapping and smaller files use random access.
 /// </summary>
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("macos")]
-public sealed class HybridDirectory : HybridDirectoryBase
+internal sealed class RuntimeHybridDirectory : HybridDirectoryBase
 {
-	public const long DefaultMmapThresholdBytes = HybridDirectoryBase.DefaultMmapThresholdBytes;
+	private readonly RuntimeRandomAccessDirectory _raDirectory;
 
-	private readonly RandomAccessDirectory _raDirectory;
+	/// <inheritdoc />
+	public RuntimeHybridDirectory(DirectoryInfo path) : this(path, null, DefaultMmapThresholdBytes) { }
 
-	public HybridDirectory(DirectoryInfo path) : this(path, null, DefaultMmapThresholdBytes) { }
-
-	public HybridDirectory(DirectoryInfo path, LockFactory? lockFactory, long mmapThresholdBytes = DefaultMmapThresholdBytes)
+	/// <inheritdoc />
+	public RuntimeHybridDirectory(DirectoryInfo path, LockFactory? lockFactory, long mmapThresholdBytes = DefaultMmapThresholdBytes)
 		: base(path, lockFactory, mmapThresholdBytes)
 	{
-		_raDirectory = new RandomAccessDirectory(path);
+		_raDirectory = new RuntimeRandomAccessDirectory(path);
 	}
+	/// <inheritdoc />
+	public RuntimeHybridDirectory(string path) : this(new DirectoryInfo(path), null, DefaultMmapThresholdBytes) { }
 
-	public HybridDirectory(string path) : this(new DirectoryInfo(path), null, DefaultMmapThresholdBytes) { }
-
+	/// <inheritdoc />
 	public override IndexInput OpenInput(string name, IOContext context)
 	{
 		// HybridDirectoryBase already implements the ShouldUseMmap logic.
 		return base.OpenInput(name, context);
 	}
 
+	/// <inheritdoc />
 	protected override IndexInput OpenMmapInput(string name, string fullPath, IOContext context) =>
-		MapDirectory.MapIndexInput.Open(fullPath, context);
+		RuntimeMapDirectory.MapIndexInput.Open(fullPath, context);
 
+	/// <inheritdoc />
 	protected override IndexInput OpenRandomAccessInput(string name, string fullPath, IOContext context) =>
 		_raDirectory.OpenInput(name, context);
 
+	/// <inheritdoc />
 	protected override IndexInputSlicer CreateMmapSlicer(string name, string fullPath, IOContext context) =>
-		MapDirectory.CreateSlicerCore(fullPath, context);
-
+		RuntimeMapDirectory.CreateSlicerCore(fullPath, context);
+	/// <inheritdoc />
 	protected override IndexInputSlicer CreateRandomAccessSlicer(string name, string fullPath, IOContext context) =>
 		_raDirectory.CreateSlicer(name, context);
 
+	/// <inheritdoc />
 	protected override void Dispose(bool disposing)
 	{
 		if (disposing)

@@ -10,15 +10,16 @@ namespace Lucene.Net.Store;
 /// </summary>
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("macos")]
-public sealed class MapDirectory : MMapDirectoryBase
+internal sealed class RuntimeMapDirectory : MMapDirectoryBase
 {
-	/// <summary>Default <see cref="BufferedIndexInput"/> buffer size for mmap reads.</summary>
-	public const int DefaultBufferSize = 8 * 1024;
+	/// <inheritdoc />
+	public RuntimeMapDirectory(DirectoryInfo path) : base(path, null) { }
+	/// <inheritdoc />
+	public RuntimeMapDirectory(DirectoryInfo path, LockFactory? lockFactory) : base(path, lockFactory) { }
+	/// <inheritdoc />
+	public RuntimeMapDirectory(string path) : this(new DirectoryInfo(path)) { }
 
-	public MapDirectory(DirectoryInfo path) : base(path, null) { }
-	public MapDirectory(DirectoryInfo path, LockFactory? lockFactory) : base(path, lockFactory) { }
-	public MapDirectory(string path) : this(new DirectoryInfo(path)) { }
-
+	/// <inheritdoc />
 	public override IndexInput OpenInput(string name, IOContext context)
 	{
 		EnsureOpen();
@@ -27,6 +28,7 @@ public sealed class MapDirectory : MMapDirectoryBase
 		return MapIndexInput.Open(fullPath, context);
 	}
 
+	/// <inheritdoc />
 	public override IndexInputSlicer CreateSlicer(string name, IOContext context)
 	{
 		EnsureOpen();

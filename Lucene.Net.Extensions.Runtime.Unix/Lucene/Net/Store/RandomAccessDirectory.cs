@@ -8,18 +8,22 @@ namespace Lucene.Net.Store;
 /// </summary>
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("macos")]
-public sealed class RandomAccessDirectory : RandomAccessDirectoryBase
+internal sealed class RuntimeRandomAccessDirectory : RandomAccessDirectoryBase
 {
 	private readonly NIOFSDirectory _inner;
 
-	public RandomAccessDirectory(DirectoryInfo path) : this(path, null) { }
-	public RandomAccessDirectory(DirectoryInfo path, LockFactory? lockFactory) : base(path, lockFactory)
+	/// <inheritdoc />
+	public RuntimeRandomAccessDirectory(DirectoryInfo path) : this(path, null) { }
+	/// <inheritdoc />
+	public RuntimeRandomAccessDirectory(DirectoryInfo path, LockFactory? lockFactory) : base(path, lockFactory)
 	{
 		_inner = new NIOFSDirectory(path);
 	}
 
-	public RandomAccessDirectory(string path) : this(new DirectoryInfo(path), null) { }
+	/// <inheritdoc />
+	public RuntimeRandomAccessDirectory(string path) : this(new DirectoryInfo(path), null) { }
 
+	/// <inheritdoc />
 	public override IndexInput OpenInput(string name, IOContext context)
 	{
 		EnsureOpen();
@@ -27,6 +31,7 @@ public sealed class RandomAccessDirectory : RandomAccessDirectoryBase
 		return _inner.OpenInput(name, context);
 	}
 
+	/// <inheritdoc />
 	public override IndexInputSlicer CreateSlicer(string name, IOContext context)
 	{
 		EnsureOpen();
@@ -34,6 +39,7 @@ public sealed class RandomAccessDirectory : RandomAccessDirectoryBase
 		return _inner.CreateSlicer(name, context);
 	}
 
+	/// <inheritdoc />
 	protected override void Dispose(bool disposing)
 	{
 		if (disposing)

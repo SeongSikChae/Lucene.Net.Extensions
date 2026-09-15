@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Biz.Bizadm.Lucene.Net.Extensions</PackageId>
+    <Version>4.8.0-beta00018-6</Version>
+    <Authors>SeongSikChae</Authors>
+    <Description>.NET 각 데이터 타입을 기반으로 인덱싱하고 검색 할 수 있게 기능 확장</Description>
+    <PackageProjectUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lucene.Net.Extensions\Lucene.Net.Extensions.csproj"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+    <ProjectReference Include="..\Lucene.Net.Extensions.Runtime.Windows\Lucene.Net.Extensions.Runtime.Windows.csproj"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+    <ProjectReference Include="..\Lucene.Net.Extensions.Runtime.Unix\Lucene.Net.Extensions.Runtime.Unix.csproj"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00018" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\Lucene.Net.Extensions\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.dll"
+          Pack="true"
+          PackagePath="lib\net10.0" />
+    <None Include="..\Lucene.Net.Extensions\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.xml"
+          Pack="true"
+          PackagePath="lib\net10.0" />
+    <None Include="..\Lucene.Net.Extensions\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.dll"
+          Pack="true"
+          PackagePath="runtimes\win\lib\net10.0;runtimes\linux\lib\net10.0;runtimes\osx\lib\net10.0" />
+    <None Include="..\Lucene.Net.Extensions.Runtime.Windows\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.Runtime.dll"
+          Pack="true"
+          PackagePath="runtimes\win\lib\net10.0" />
+    <None Include="..\Lucene.Net.Extensions.Runtime.Unix\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.Runtime.dll"
+          Pack="true"
+          PackagePath="runtimes\linux\lib\net10.0" />
+    <None Include="..\Lucene.Net.Extensions.Runtime.Unix\bin\$(Configuration)\net10.0\Biz.Bizadm.Lucene.Net.Extensions.Runtime.dll"
+          Pack="true"
+          PackagePath="runtimes\osx\lib\net10.0" />
+  </ItemGroup>
+</Project>

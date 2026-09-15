@@ -1,7 +1,24 @@
 # Lucene.Net namespace Extensions
 
-.NET 데이터 타입을 Lucene.Net에서 인덱싱·검색·정렬할 수 있게 확장하고, Windows에 맞춘 `Directory` 구현을 제공합니다.  
+.NET 데이터 타입을 Lucene.Net에서 인덱싱·검색·정렬할 수 있게 확장하고, 플랫폼 공통 `Directory` 구현과 Windows 최적화 구현을 제공합니다.  
 대상 프레임워크: **.NET 10**, Lucene.Net **4.8.0-beta00018**, 패키지 버전 **4.8.0-beta00018-6**.
+
+NuGet 패키지 하나만 설치하면 됩니다.
+
+```text
+Biz.Bizadm.Lucene.Net.Extensions
+```
+
+패키지에는 공통 API 어셈블리와 플랫폼별 managed runtime asset이 함께 포함됩니다.
+
+```text
+lib/net10.0/Biz.Bizadm.Lucene.Net.Extensions.dll
+runtimes/win/lib/net10.0/Biz.Bizadm.Lucene.Net.Extensions.Runtime.dll
+runtimes/linux/lib/net10.0/Biz.Bizadm.Lucene.Net.Extensions.Runtime.dll
+runtimes/osx/lib/net10.0/Biz.Bizadm.Lucene.Net.Extensions.Runtime.dll
+```
+
+NuGet과 .NET SDK가 소비 프로젝트의 RID에 맞는 런타임 어셈블리만 빌드 및 배포 출력에 선택합니다.
 
 > **Breaking change (4.8.0-beta00018-4):** `IPAddressField` / `DecimalField`는 limb AND 구조를 폐기하고, **논리값당 prefix-coded trie term** 으로 재설계했습니다. 기존 인덱스는 재색인이 필요합니다. 정렬은 `CreateSortValueFields`로 **단일값 `_$Sort` SortedDocValues** 를 쓰고, 범위 검색은 NumericUtils 스타일 **precision-step trie** 로 동작합니다.
 

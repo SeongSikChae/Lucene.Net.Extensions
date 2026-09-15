@@ -8,8 +8,10 @@ public abstract class HybridDirectoryBase : NativeFSDirectoryBase
 	/// <summary>Default size threshold (1 MiB) above which mmap reads are preferred.</summary>
 	public const long DefaultMmapThresholdBytes = 1L * 1024 * 1024;
 
+	/// <inheritdoc />
 	public long MmapThresholdBytes { get; }
 
+	/// <inheritdoc />
 	protected HybridDirectoryBase(DirectoryInfo path, LockFactory? lockFactory, long mmapThresholdBytes = DefaultMmapThresholdBytes)
 		: base(path, lockFactory)
 	{
@@ -17,6 +19,7 @@ public abstract class HybridDirectoryBase : NativeFSDirectoryBase
 		MmapThresholdBytes = mmapThresholdBytes;
 	}
 
+	/// <inheritdoc />
 	protected virtual bool ShouldUseMmap(long length, IOContext context)
 	{
 		if (length == 0)
@@ -31,6 +34,7 @@ public abstract class HybridDirectoryBase : NativeFSDirectoryBase
 		return false;
 	}
 
+	/// <inheritdoc />
 	public override IndexInput OpenInput(string name, IOContext context)
 	{
 		EnsureOpen();
@@ -43,6 +47,7 @@ public abstract class HybridDirectoryBase : NativeFSDirectoryBase
 			: OpenRandomAccessInput(name, fullPath, context);
 	}
 
+	/// <inheritdoc />
 	public override IndexInputSlicer CreateSlicer(string name, IOContext context)
 	{
 		EnsureOpen();
@@ -55,8 +60,12 @@ public abstract class HybridDirectoryBase : NativeFSDirectoryBase
 			: CreateRandomAccessSlicer(name, fullPath, context);
 	}
 
+	/// <inheritdoc />
 	protected abstract IndexInput OpenMmapInput(string name, string fullPath, IOContext context);
+	/// <inheritdoc />
 	protected abstract IndexInput OpenRandomAccessInput(string name, string fullPath, IOContext context);
+	/// <inheritdoc />
 	protected abstract IndexInputSlicer CreateMmapSlicer(string name, string fullPath, IOContext context);
+	/// <inheritdoc />
 	protected abstract IndexInputSlicer CreateRandomAccessSlicer(string name, string fullPath, IOContext context);
 }

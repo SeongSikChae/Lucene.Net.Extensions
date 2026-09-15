@@ -11,6 +11,7 @@ public sealed class SharedResourceGate
 	private int _closed; // 0 open, 1 closed
 	private readonly ManualResetEventSlim _noReaders = new(initialState: true);
 
+	/// <inheritdoc />
 	public void AddOwner()
 	{
 		if (Volatile.Read(ref _closed) != 0)
@@ -41,6 +42,7 @@ public sealed class SharedResourceGate
 		return true;
 	}
 
+	/// <inheritdoc />
 	public ReaderScope EnterRead()
 	{
 		if (Volatile.Read(ref _closed) != 0)
@@ -65,12 +67,15 @@ public sealed class SharedResourceGate
 			_noReaders.Set();
 	}
 
+	/// <inheritdoc />
 	public ref struct ReaderScope
 	{
 		private SharedResourceGate? _gate;
 
+		/// <inheritdoc />
 		public ReaderScope(SharedResourceGate gate) => _gate = gate;
 
+		/// <inheritdoc />
 		public void Dispose()
 		{
 			SharedResourceGate? gate = _gate;

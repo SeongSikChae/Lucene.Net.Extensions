@@ -11,6 +11,7 @@ public abstract class NativeFSDirectoryBase : FSDirectory
 	/// <summary>FileStream buffer size (OS-side). Larger than Lucene default for sequential segment writes.</summary>
 	public const int WriteBufferSize = 256 * 1024;
 
+	/// <inheritdoc />
 	protected NativeFSDirectoryBase(DirectoryInfo path, LockFactory? lockFactory)
 		: base(path, lockFactory!)
 	{
@@ -27,6 +28,7 @@ public abstract class NativeFSDirectoryBase : FSDirectory
 			throw new ArgumentOutOfRangeException(nameof(length));
 	}
 
+	/// <inheritdoc />
 	public override IndexOutput CreateOutput(string name, IOContext context)
 	{
 		EnsureOpen();
