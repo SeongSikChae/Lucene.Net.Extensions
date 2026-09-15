@@ -10,14 +10,14 @@ namespace Lucene.Net.Store;
 /// </summary>
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("macos")]
-internal sealed class RuntimeMapDirectory : MMapDirectoryBase
+internal sealed class RuntimeMemoryMappedDirectory : MemoryMappedDirectoryBase
 {
 	/// <inheritdoc />
-	public RuntimeMapDirectory(DirectoryInfo path) : base(path, null) { }
+	public RuntimeMemoryMappedDirectory(DirectoryInfo path) : base(path, null) { }
 	/// <inheritdoc />
-	public RuntimeMapDirectory(DirectoryInfo path, LockFactory? lockFactory) : base(path, lockFactory) { }
+	public RuntimeMemoryMappedDirectory(DirectoryInfo path, LockFactory? lockFactory) : base(path, lockFactory) { }
 	/// <inheritdoc />
-	public RuntimeMapDirectory(string path) : this(new DirectoryInfo(path)) { }
+	public RuntimeMemoryMappedDirectory(string path) : this(new DirectoryInfo(path)) { }
 
 	/// <inheritdoc />
 	public override IndexInput OpenInput(string name, IOContext context)
@@ -25,7 +25,7 @@ internal sealed class RuntimeMapDirectory : MMapDirectoryBase
 		EnsureOpen();
 		EnsureCanRead(name);
 		string fullPath = Path.Combine(Directory.FullName, name);
-		return MapIndexInput.Open(fullPath, context);
+		return MemoryMappedIndexInput.Open(fullPath, context);
 	}
 
 	/// <inheritdoc />
@@ -42,7 +42,7 @@ internal sealed class RuntimeMapDirectory : MMapDirectoryBase
 		MappingOwner owner = MappingOwner.Open(fullPath, prefetchBytes: Math.Min(1L << 20, fileLength));
 		try
 		{
-			return new MapSlicer(owner, context);
+			return new MemoryMappedSlicer(owner, context);
 		}
 		catch
 		{
@@ -189,13 +189,13 @@ internal sealed class RuntimeMapDirectory : MMapDirectoryBase
 		}
 	}
 
-	internal sealed class MapSlicer : Directory.IndexInputSlicer
+	internal sealed class MemoryMappedSlicer : Directory.IndexInputSlicer
 	{
 		private readonly MappingOwner _owner;
 		private readonly IOContext _context;
 		private int _disposed;
 
-		public MapSlicer(MappingOwner owner, IOContext context)
+		public MemoryMappedSlicer(MappingOwner owner, IOContext context)
 		{
 			_owner = owner;
 			_context = context;
@@ -209,8 +209,8 @@ internal sealed class RuntimeMapDirectory : MMapDirectoryBase
 			{
 				_owner.TryPrefetchRange(offset, Math.Min(length, 1L << 20));
 				int bufferSize = Math.Max(BufferedIndexInput.GetBufferSize(_context), DefaultBufferSize);
-				return new MapIndexInput(
-					$"MapIndexInput({sliceDescription} slice={offset}:{offset + length})",
+				return new MemoryMappedIndexInput(
+					$"MemoryMappedIndexInput({sliceDescription} slice={offset}:{offset + length})",
 					_owner,
 					offset,
 					length,
@@ -234,22 +234,22 @@ internal sealed class RuntimeMapDirectory : MMapDirectoryBase
 		}
 	}
 
-	internal sealed class MapIndexInput : BufferedIndexInput
+	internal sealed class MemoryMappedIndexInput : BufferedIndexInput
 	{
 		private readonly MappingOwner _owner;
 		private readonly long _off;
 		private readonly long _end;
 		private int _disposed;
 
-		public static MapIndexInput Open(string path, IOContext context)
+		public static MemoryMappedIndexInput Open(string path, IOContext context)
 		{
 			long fileLength = new FileInfo(path).Length;
 			MappingOwner owner = MappingOwner.Open(path, prefetchBytes: Math.Min(1L << 20, fileLength));
 			try
 			{
 				int bufferSize = Math.Max(BufferedIndexInput.GetBufferSize(context), DefaultBufferSize);
-				return new MapIndexInput(
-					$"MapIndexInput(path=\"{path}\")",
+				return new MemoryMappedIndexInput(
+					$"MemoryMappedIndexInput(path=\"{path}\")",
 					owner,
 					0,
 					owner.Length,
@@ -262,7 +262,7 @@ internal sealed class RuntimeMapDirectory : MMapDirectoryBase
 			}
 		}
 
-		public MapIndexInput(string resourceDesc, MappingOwner owner, long off, long length, int bufferSize)
+		public MemoryMappedIndexInput(string resourceDesc, MappingOwner owner, long off, long length, int bufferSize)
 			: base(resourceDesc, bufferSize)
 		{
 			_owner = owner;
@@ -289,7 +289,7 @@ internal sealed class RuntimeMapDirectory : MMapDirectoryBase
 			_owner.AddRef();
 			try
 			{
-				MapIndexInput clone = (MapIndexInput)base.Clone();
+				MemoryMappedIndexInput clone = (MemoryMappedIndexInput)base.Clone();
 				clone._disposed = 0;
 				return clone;
 			}

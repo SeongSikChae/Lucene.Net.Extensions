@@ -1,7 +1,7 @@
 # Lucene.Net namespace Extensions
 
 .NET 데이터 타입을 Lucene.Net에서 인덱싱·검색·정렬할 수 있게 확장하고, 플랫폼 공통 `Directory` 구현과 Windows 최적화 구현을 제공합니다.  
-대상 프레임워크: **.NET 10**, Lucene.Net **4.8.0-beta00018**, 패키지 버전 **4.8.0-beta00018-6**.
+대상 프레임워크: **.NET 10**, Lucene.Net **4.8.0-beta00018**, 패키지 버전 **4.8.0-beta00018-7**.
 
 NuGet 패키지 하나만 설치하면 됩니다.
 
@@ -22,33 +22,33 @@ NuGet과 .NET SDK가 소비 프로젝트의 RID에 맞는 런타임 어셈블리
 
 > **Breaking change (4.8.0-beta00018-4):** `IPAddressField` / `DecimalField`는 limb AND 구조를 폐기하고, **논리값당 prefix-coded trie term** 으로 재설계했습니다. 기존 인덱스는 재색인이 필요합니다. 정렬은 `CreateSortValueFields`로 **단일값 `_$Sort` SortedDocValues** 를 쓰고, 범위 검색은 NumericUtils 스타일 **precision-step trie** 로 동작합니다.
 
-## Lucene.Net.Store namespace Extensions (Windows)
+## Lucene.Net.Store namespace Extensions
 
-Windows 전용 FSDirectory입니다. 쓰기는 공통(`WinFSDirectoryBase`)으로 SequentialScan + 대용량 OS 버퍼를 쓰고, 읽기 전략만 구현체별로 다릅니다.
+플랫폼별 런타임으로 위임하는 크로스 플랫폼 `FSDirectory` 구현입니다.
 
 | 클래스 | 읽기 방식 | 언제 쓰면 좋은지 |
 | --- | --- | --- |
-| `WinMMapDirectory` | Memory-mapped + unsafe pointer copy | 큰 세그먼트·랜덤 읽기가 많은 검색 위주 |
-| `WinRandomAccessDirectory` | `FILE_FLAG_RANDOM_ACCESS` FileStream | mmap 부담을 피하고 싶을 때, 작은 파일 |
-| `WinHybridDirectory` | 임계값 기준으로 mmap / RA 자동 선택 | 기본 권장 (기본 임계값 1 MiB) |
+| `MemoryMappedDirectory` | 플랫폼별 memory-mapped 구현 | 큰 세그먼트·랜덤 읽기가 많은 검색 위주 |
+| `RandomAccessDirectory` | 플랫폼별 random-access 구현 | mmap 부담을 피하고 싶을 때, 작은 파일 |
+| `HybridDirectory` | 임계값 기준으로 mmap / random-access 자동 선택 | 기본 권장 (기본 임계값 1 MiB) |
 
-* 플랫폼: **Windows only** (`[SupportedOSPlatform("windows")]`).
+* 플랫폼: **Windows, Linux, macOS**.
 * Clone/slice와 dispose 경합을 막기 위해 공유 리소스를 ref-count합니다.
-* 빈 파일(0 bytes)은 Windows에서 mmap할 수 없어 `WinHybridDirectory`가 RA 경로로 처리합니다.
-* `WinHybridDirectory`는 merge 컨텍스트에서 임계값의 1/4 이상이면 mmap을 선호합니다.
+* 빈 파일(0 bytes)은 mmap 대신 `HybridDirectory`의 random-access 경로로 처리합니다.
+* `HybridDirectory`는 merge 컨텍스트에서 임계값의 1/4 이상이면 mmap을 선호합니다.
 
 ```csharp
 using Lucene.Net.Store;
 
 // 권장: 파일 크기에 따라 mmap / random-access 자동 선택
-using Directory dir = new WinHybridDirectory(@"C:\indexes\demo");
+using Directory dir = new HybridDirectory(@"C:\indexes\demo");
 
 // 또는 읽기 전략을 고정
-using Directory mmap = new WinMMapDirectory(@"C:\indexes\demo");
-using Directory ra = new WinRandomAccessDirectory(@"C:\indexes\demo");
+using Directory mmap = new MemoryMappedDirectory(@"C:\indexes\demo");
+using Directory ra = new RandomAccessDirectory(@"C:\indexes\demo");
 
 // 임계값 커스터마이즈 (예: 512 KiB 이상이면 mmap)
-using Directory hybrid = new WinHybridDirectory(
+using Directory hybrid = new HybridDirectory(
     new DirectoryInfo(@"C:\indexes\demo"),
     lockFactory: null,
     mmapThresholdBytes: 512 * 1024);

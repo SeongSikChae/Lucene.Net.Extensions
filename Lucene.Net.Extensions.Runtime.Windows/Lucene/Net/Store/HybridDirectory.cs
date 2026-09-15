@@ -21,7 +21,7 @@ internal sealed class RuntimeHybridDirectory : HybridDirectoryBase
 
 	/// <inheritdoc />
 	protected override IndexInput OpenMmapInput(string name, string fullPath, IOContext context) =>
-		RuntimeMapDirectory.MapIndexInput.Open(fullPath, context);
+		RuntimeMemoryMappedDirectory.MemoryMappedIndexInput.Open(fullPath, context);
 
 	/// <inheritdoc />
 	protected override IndexInput OpenRandomAccessInput(string name, string fullPath, IOContext context)
@@ -45,7 +45,7 @@ internal sealed class RuntimeHybridDirectory : HybridDirectoryBase
 	}
 	/// <inheritdoc />
 	protected override IndexInputSlicer CreateMmapSlicer(string name, string fullPath, IOContext context) =>
-		RuntimeMapDirectory.CreateSlicerCore(fullPath, context);
+		RuntimeMemoryMappedDirectory.CreateSlicerCore(fullPath, context);
 
 	/// <inheritdoc />
 	protected override IndexInputSlicer CreateRandomAccessSlicer(string name, string fullPath, IOContext context) =>

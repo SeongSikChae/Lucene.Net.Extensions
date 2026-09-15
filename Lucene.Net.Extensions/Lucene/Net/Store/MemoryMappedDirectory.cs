@@ -5,27 +5,27 @@ namespace Lucene.Net.Store;
 /// <summary>
 /// OS별 구현체로 위임하는 메인 패키지의 public Directory 래퍼입니다.
 /// </summary>
-public sealed class MapDirectory : MMapDirectoryBase
+public sealed class MemoryMappedDirectory : MemoryMappedDirectoryBase
 {
 	private readonly Directory _impl;
 
 	/// <inheritdoc />
-	public new const int DefaultBufferSize = MMapDirectoryBase.DefaultBufferSize;
+	public new const int DefaultBufferSize = MemoryMappedDirectoryBase.DefaultBufferSize;
 
 	/// <inheritdoc />
-	public MapDirectory(DirectoryInfo path) : this(path, null) { }
+	public MemoryMappedDirectory(DirectoryInfo path) : this(path, null) { }
 
 	/// <inheritdoc />
-	public MapDirectory(DirectoryInfo path, LockFactory? lockFactory) : base(path, lockFactory)
+	public MemoryMappedDirectory(DirectoryInfo path, LockFactory? lockFactory) : base(path, lockFactory)
 	{
 		_impl = (Directory)RuntimeDirectoryLoader.CreateInstance(
-			runtimeTypeFullName: "Lucene.Net.Store.RuntimeMapDirectory",
+			runtimeTypeFullName: "Lucene.Net.Store.RuntimeMemoryMappedDirectory",
 			path,
 			lockFactory);
 	}
 
 	/// <inheritdoc />
-	public MapDirectory(string path) : this(new DirectoryInfo(path), null) { }
+	public MemoryMappedDirectory(string path) : this(new DirectoryInfo(path), null) { }
 
 	/// <inheritdoc />
 	public override IndexInput OpenInput(string name, IOContext context)

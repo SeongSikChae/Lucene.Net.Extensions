@@ -19,7 +19,7 @@
 		<PackageProjectUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/SeongSikChae/Lucene.Net.Extensions.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<Version>4.8.0-beta00018-6</Version>
+		<Version>4.8.0-beta00018-7</Version>
 		<PackageId>Biz.Bizadm.Lucene.Net.Extensions</PackageId>
 		<AssemblyName>Biz.Bizadm.$(MSBuildProjectName)</AssemblyName>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
